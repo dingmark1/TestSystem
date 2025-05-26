@@ -27,17 +27,15 @@ class Ui_TeacherWindow
 {
 public:
     QWidget *centralwidget;
-    QWidget *widget;
+    QWidget *layoutWidget;
     QVBoxLayout *verticalLayout_2;
     QLabel *label;
     QSpacerItem *verticalSpacer_2;
     QHBoxLayout *horizontalLayout;
-    QSpacerItem *horizontalSpacer;
     QVBoxLayout *verticalLayout;
     QPushButton *upload_pushButton;
     QSpacerItem *verticalSpacer;
     QPushButton *manage_pushButton_2;
-    QSpacerItem *horizontalSpacer_2;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -48,13 +46,13 @@ public:
         TeacherWindow->resize(800, 600);
         centralwidget = new QWidget(TeacherWindow);
         centralwidget->setObjectName("centralwidget");
-        widget = new QWidget(centralwidget);
-        widget->setObjectName("widget");
-        widget->setGeometry(QRect(250, 80, 321, 291));
-        verticalLayout_2 = new QVBoxLayout(widget);
+        layoutWidget = new QWidget(centralwidget);
+        layoutWidget->setObjectName("layoutWidget");
+        layoutWidget->setGeometry(QRect(250, 80, 321, 291));
+        verticalLayout_2 = new QVBoxLayout(layoutWidget);
         verticalLayout_2->setObjectName("verticalLayout_2");
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
-        label = new QLabel(widget);
+        label = new QLabel(layoutWidget);
         label->setObjectName("label");
         label->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
@@ -66,13 +64,9 @@ public:
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-
-        horizontalLayout->addItem(horizontalSpacer);
-
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName("verticalLayout");
-        upload_pushButton = new QPushButton(widget);
+        upload_pushButton = new QPushButton(layoutWidget);
         upload_pushButton->setObjectName("upload_pushButton");
 
         verticalLayout->addWidget(upload_pushButton);
@@ -81,7 +75,7 @@ public:
 
         verticalLayout->addItem(verticalSpacer);
 
-        manage_pushButton_2 = new QPushButton(widget);
+        manage_pushButton_2 = new QPushButton(layoutWidget);
         manage_pushButton_2->setObjectName("manage_pushButton_2");
 
         verticalLayout->addWidget(manage_pushButton_2);
@@ -90,10 +84,6 @@ public:
         verticalLayout->setStretch(2, 1);
 
         horizontalLayout->addLayout(verticalLayout);
-
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
-
-        horizontalLayout->addItem(horizontalSpacer_2);
 
 
         verticalLayout_2->addLayout(horizontalLayout);

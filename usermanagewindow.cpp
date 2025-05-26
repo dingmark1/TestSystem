@@ -16,15 +16,18 @@ UserManageWindow::UserManageWindow(QWidget *parent)
     ui->type_comboBox->addItem("老师");
     ui->type_comboBox->addItem("管理员");
 
-    // 设置表头自适应拉伸模式（平均填充）
-    ui->user_TableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    // 设置表格为只读
+    ui->user_TableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    // 确保表格本身填满布局空间
+    // 设置表头自适应拉伸模式（平均填充）,确保表格本身填满布局空间
+    ui->user_TableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->user_TableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // 查询用户功能
     connect(&NetworkManager::instance(), &NetworkManager::userqueryFinished,
             this, &UserManageWindow::handleuserQueryFinished);
+
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 UserManageWindow::~UserManageWindow()

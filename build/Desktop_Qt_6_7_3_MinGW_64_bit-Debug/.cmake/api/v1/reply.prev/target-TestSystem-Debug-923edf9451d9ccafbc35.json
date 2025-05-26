@@ -77,13 +77,13 @@
 			{
 				"command" : 4,
 				"file" : 1,
-				"line" : 83,
+				"line" : 84,
 				"parent" : 0
 			},
 			{
 				"command" : 5,
 				"file" : 1,
-				"line" : 63,
+				"line" : 64,
 				"parent" : 0
 			},
 			{
@@ -416,18 +416,19 @@
 				38,
 				41,
 				44,
-				47
+				47,
+				50
 			]
 		}
 	],
 	"dependencies" : 
 	[
 		{
-			"backtrace" : 0,
-			"id" : "TestSystem_autogen::@6890427a1f51a3e7e1df"
+			"id" : "TestSystem_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
 		},
 		{
-			"id" : "TestSystem_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
+			"backtrace" : 0,
+			"id" : "TestSystem_autogen::@6890427a1f51a3e7e1df"
 		}
 	],
 	"id" : "TestSystem::@6890427a1f51a3e7e1df",
@@ -564,7 +565,8 @@
 				38,
 				41,
 				44,
-				47
+				47,
+				50
 			]
 		},
 		{
@@ -589,8 +591,6 @@
 				43,
 				46,
 				49,
-				50,
-				51,
 				52,
 				53,
 				54,
@@ -601,7 +601,11 @@
 				59,
 				60,
 				61,
-				62
+				62,
+				63,
+				64,
+				65,
+				66
 			]
 		},
 		{
@@ -622,14 +626,15 @@
 				42,
 				45,
 				48,
-				63
+				51,
+				67
 			]
 		},
 		{
 			"name" : "CMake Rules",
 			"sourceIndexes" : 
 			[
-				64
+				68
 			]
 		}
 	],
@@ -900,6 +905,22 @@
 			"sourceGroupIndex" : 2
 		},
 		{
+			"backtrace" : 4,
+			"path" : "changejudgewindow.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"compileGroupIndex" : 0,
+			"path" : "changejudgewindow.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 4,
+			"path" : "changejudgewindow.ui",
+			"sourceGroupIndex" : 2
+		},
+		{
 			"backtrace" : 0,
 			"isGenerated" : true,
 			"path" : "build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/TestSystem_autogen/include/ui_mainwindow.h",
@@ -981,6 +1002,12 @@
 			"backtrace" : 0,
 			"isGenerated" : true,
 			"path" : "build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/TestSystem_autogen/include/ui_changemulwindow.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/TestSystem_autogen/include/ui_changejudgewindow.h",
 			"sourceGroupIndex" : 1
 		},
 		{

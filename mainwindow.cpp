@@ -59,19 +59,28 @@ void MainWindow::handleLoginResponse(bool success, const QString &message, const
         //ui->prompt_label_5->setText("登录成功");
         //QString userType = data.value("user_type").toString();
         QString userType = ui->Usertype_comboBox->currentText();
+        ui->prompt_label_5->setText("");
+        ui->Username_lineEdit->setText("");
+        ui->Code_lineEdit_2->setText("");
 
         // 根据用户类型跳转到对应界面
         if(userType == "老师"){
             TeacherWindow *teacherWindow = new TeacherWindow();
+            teacherWindow->setAttribute(Qt::WA_DeleteOnClose);
+            connect(teacherWindow, &TeacherWindow::destroyed, this, &MainWindow::show);
             teacherWindow->show();
             this->hide();
         }else if(userType == "学生"){
             // TODO: 学生界面跳转
             StudentWindow *studentWindow = new StudentWindow();
+            studentWindow->setAttribute(Qt::WA_DeleteOnClose);
+            connect(studentWindow, &StudentWindow::destroyed, this, &MainWindow::show);
             studentWindow->show();
             this->hide();
         }else{
             AdministratorWindow *administrator = new AdministratorWindow();
+            administrator->setAttribute(Qt::WA_DeleteOnClose);
+            connect(administrator, &AdministratorWindow::destroyed, this, &MainWindow::show);
             administrator -> show();
             this -> hide();
         }

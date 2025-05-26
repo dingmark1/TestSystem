@@ -9,6 +9,7 @@ MulSelectWindow::MulSelectWindow(QWidget *parent)
     , ui(new Ui::MulSelectWindow)
 {
     ui->setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 MulSelectWindow::~MulSelectWindow()

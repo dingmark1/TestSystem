@@ -9,6 +9,7 @@ JudgeWindow::JudgeWindow(QWidget *parent)
     , ui(new Ui::JudgeWindow)
 {
     ui->setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 JudgeWindow::~JudgeWindow()
@@ -25,7 +26,7 @@ void JudgeWindow::on_upload_pushButton_clicked()
     if (ui->correct_radioButton->isChecked()) {
         selectedOption = 1;
     } else if (ui->fault_radioButton_2->isChecked()) {
-        selectedOption = 2;
+        selectedOption = 0;
     }
     if (selectedOption == -1 || question.isEmpty() || subject.isEmpty()) {
         QMessageBox::warning(this, "提示", "请确保题目完整");

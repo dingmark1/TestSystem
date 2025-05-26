@@ -54,6 +54,12 @@ public:
     // 修改————获取多选题数据
     void sendSpecificMulSelectRequest(const QString &id);
 
+    // 修改————获取判断题数据
+    void sendSpecificJudgeRequest(const QString &id);
+
+    // 修改————获取简答题数据
+    void sendSpecificShortRequest(const QString &id);
+
     // 修改————上传单选题
     void sendchangeSingleSelectRequest(int ID,
                                     const QString &question,
@@ -69,6 +75,21 @@ public:
                                     int answer,
                                     const QString &subject,
                                     const QString &uploader);
+
+    // 修改————上传判断题
+    void sendchangeJudgeRequest(int ID,
+                                    const QString &question,
+                                    int answer,
+                                    const QString &subject,
+                                    const QString &uploader);
+
+    // 修改————上传简答题
+    void sendchangeShortRequest(int ID,
+                                const QString &question,
+                                const QString &answer,
+                                const QString &subject,
+                                const QString &uploader);
+
 
     // 用户查询
     void senduserQueryRequest(const QString &content, const QString &type);
@@ -101,7 +122,7 @@ signals:
     // 题目删除完成信号
     void deleteFinished(bool success, const QString &message);
 
-    // 获取指定单选题目数据完成信号
+    // 获取指定单选题目数据完成信号，其他题型也可以用，只不过要注意部分参数使无用的
     void specificSingleSelectReceived(bool success, const QString &message,
                                       const QString &question,
                                       const QStringList &options,
@@ -109,7 +130,7 @@ signals:
                                       const QString &subject);
 
     // 修改————上传单选题数据的完成信号，其实也没用，直接用addSingleSelectFinished信号就行
-    // 不过为了格式统一，后续的所有修改功能的上传完成信号就都用这个了
+    // 不过为了格式统一，后续的所有类型题目的修改功能的上传完成信号就都用这个了
     void changeSingleSelectFinished(bool success, const QString &message);
 
     // 用户查询完成信号
@@ -128,14 +149,22 @@ signals:
 private:
     explicit NetworkManager(QObject *parent = nullptr);
     void handleLoginResponse(QNetworkReply *reply);  // 处理登录响应
+
     void handleAddSingleSelectResponse(QNetworkReply *reply);   //处理上传单选题的响应（其他的题型也一样用）
+
     void handleQueryResponse(QNetworkReply *reply); // 处理题目查询
     void handleDeleteResponse(QNetworkReply *reply);// 处理题目删除
-    void handleSpecificSingleSelectResponse(QNetworkReply *reply);  // 处理单选题数据响应
-    void handlechangeSingleSelectResponse(QNetworkReply *reply);//处理修改————上传单选题的响应,其实多余了，可以直接用上传题目的响应的
+
+    void handleSpecificSingleSelectResponse(QNetworkReply *reply);  // 处理单选题/多选题数据响应
+    void handleSpecificJudgeResponse(QNetworkReply *reply);  // 处理判断题数据响应
+    void handleSpecificShortResponse(QNetworkReply *reply);  // 处理简答题数据响应
+
+    void handlechangeSingleSelectResponse(QNetworkReply *reply);//处理修改后上传单选题的响应,其实多余了，可以直接用上传题目的响应的
+
     void handleuserQueryResponse(QNetworkReply *reply); // 处理用户查询
     void handleuserDeleteResponse(QNetworkReply *reply);// 处理用户删除
     void handleuserAddResponse(QNetworkReply *reply);// 处理用户删除
+
     void handleAddTestResponse(QNetworkReply *reply);// 处理试卷上传
 
 

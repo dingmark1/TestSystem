@@ -11,9 +11,16 @@ TestProductWindow::TestProductWindow(QWidget *parent)
     , ui(new Ui::TestProductWindow)
 {
     ui->setupUi(this);
+
+    // 设置表格为只读
+    ui->Question_TableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    ui->Selected_TableWidget_2->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
     // 设置表格自适应拉伸
     ui->Question_TableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->Question_TableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    ui->Selected_TableWidget_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->Selected_TableWidget_2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     // 连接查询结果信号
     connect(&NetworkManager::instance(), &NetworkManager::queryFinished,
@@ -22,6 +29,8 @@ TestProductWindow::TestProductWindow(QWidget *parent)
     // 试卷上传信号
     connect(&NetworkManager::instance(), &NetworkManager::addTestFinished,
             this, &TestProductWindow::handleAddTestFinished);
+
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 TestProductWindow::~TestProductWindow()

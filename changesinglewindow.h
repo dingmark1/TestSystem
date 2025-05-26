@@ -22,6 +22,7 @@ private slots:
 
 private:
     Ui::ChangeSingleWindow *ui;
+    QMetaObject::Connection m_uploadConnection;
 };
 
 #endif // CHANGESINGLEWINDOW_H

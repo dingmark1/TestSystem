@@ -16,8 +16,6 @@ public:
     ~TeacherWindow();
 
 private slots:
-    void on_pushButton_clicked();
-
     void on_manage_pushButton_2_clicked();
 
     void on_upload_pushButton_clicked();

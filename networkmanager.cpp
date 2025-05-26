@@ -362,7 +362,9 @@ void NetworkManager::handleDeleteResponse(QNetworkReply *reply)
     emit deleteFinished(success, message);
 }
 
-
+// 修改题目功能
+// 附：其实应该把所有获取数据写在一个函数里再用type做分类选择的，但是我懒得重新整合了，就复制粘贴几份吧
+// 再附：其实就应该把拼接URL的功能下放到槽函数里，这样把四个获取指定id的函数就能合成一个了
 // 修改单选题功能————获取指定单选题数据
 void NetworkManager::sendSpecificSingleSelectRequest(const QString &id)
 {
@@ -395,7 +397,6 @@ void NetworkManager::sendSpecificSingleSelectRequest(const QString &id)
 }
 
 // 修改多选题功能———获取指定多选题数据
-// 其实应该把所有获取数据写在一个函数里再用type做分类选择的，但是我懒得重新整合了，就复制粘贴几份吧
 void NetworkManager::sendSpecificMulSelectRequest(const QString &id)
 {
     QUrl url(QString("%1/specific_mulquestion").arg(BASE_URL));
@@ -426,7 +427,69 @@ void NetworkManager::sendSpecificMulSelectRequest(const QString &id)
     });
 }
 
-// 固定单选题的返回数据处理，多选题也可以用
+// 修改判断题功能————获取指定判断题数据
+void NetworkManager::sendSpecificJudgeRequest(const QString &id)
+{
+    QUrl url(QString("%1/specific_judgequestion").arg(BASE_URL));
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QJsonObject json;
+    json["id"] = id;
+
+    QNetworkReply *reply = m_networkManager->post(
+        request, QJsonDocument(json).toJson()
+        );
+
+    QTimer *timeoutTimer = new QTimer(reply);
+    timeoutTimer->setSingleShot(true);
+    connect(timeoutTimer, &QTimer::timeout, [=]() {
+        reply->abort();
+        emit specificSingleSelectReceived(false, "请求超时", "", {}, -1, "");
+        reply->deleteLater();
+    });
+    timeoutTimer->start(30000);
+
+    connect(reply, &QNetworkReply::finished, [=](){
+        timeoutTimer->stop();
+        handleSpecificSingleSelectResponse(reply);
+        reply->deleteLater();
+        timeoutTimer->deleteLater();
+    });
+}
+
+// 修改简答题功能————获取指定简答题数据
+void NetworkManager::sendSpecificShortRequest(const QString &id)
+{
+    QUrl url(QString("%1/specific_shortquestion").arg(BASE_URL));
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QJsonObject json;
+    json["id"] = id;
+
+    QNetworkReply *reply = m_networkManager->post(
+        request, QJsonDocument(json).toJson()
+        );
+
+    QTimer *timeoutTimer = new QTimer(reply);
+    timeoutTimer->setSingleShot(true);
+    connect(timeoutTimer, &QTimer::timeout, [=]() {
+        reply->abort();
+        emit specificSingleSelectReceived(false, "请求超时", "", {}, -1, "");
+        reply->deleteLater();
+    });
+    timeoutTimer->start(30000);
+
+    connect(reply, &QNetworkReply::finished, [=](){
+        timeoutTimer->stop();
+        handleSpecificSingleSelectResponse(reply);
+        reply->deleteLater();
+        timeoutTimer->deleteLater();
+    });
+}
+
+// 单个单选题的返回数据处理，多选题也可以用
 void NetworkManager::handleSpecificSingleSelectResponse(QNetworkReply *reply)
 {
     bool success = false;
@@ -456,6 +519,74 @@ void NetworkManager::handleSpecificSingleSelectResponse(QNetworkReply *reply)
         message = reply->errorString();
     }
 
+    emit specificSingleSelectReceived(success, message, question, options, answer, subject);
+}
+
+// 单个判断题的返回数据处理
+void NetworkManager::handleSpecificJudgeResponse(QNetworkReply *reply)
+{
+    bool success = false;
+    QString message, question, subject;
+    QStringList options;
+    int answer = -1;
+
+    if(reply->error() == QNetworkReply::NoError){
+        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+        QJsonObject obj = doc.object();
+        int code = obj["code"].toInt();
+        message = obj["message"].toString();
+
+        if(code == 200){
+            success = true;
+            QJsonObject data = obj["data"].toObject();
+            question = data["question"].toString();
+            subject = data["subject"].toString();
+            answer = data["answer"].toInt();
+
+            // QJsonArray optionsArray = data["options"].toArray();
+            // for(const auto& option : optionsArray){
+            //     options << option.toString();
+            // }
+        }
+    } else {
+        message = reply->errorString();
+    }
+
+    // 依然使用单选题信息处理的signal函数即可，只不过option参数无用
+    emit specificSingleSelectReceived(success, message, question, options, answer, subject);
+}
+
+// 单个简答题的返回数据处理
+void NetworkManager::handleSpecificShortResponse(QNetworkReply *reply)
+{
+    bool success = false;
+    QString message, question, subject;
+    QStringList options;
+    int answer = -1;
+
+    if(reply->error() == QNetworkReply::NoError){
+        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+        QJsonObject obj = doc.object();
+        int code = obj["code"].toInt();
+        message = obj["message"].toString();
+
+        if(code == 200){
+            success = true;
+            QJsonObject data = obj["data"].toObject();
+            question = data["question"].toString();
+            subject = data["subject"].toString();
+            // answer = data["answer"].toInt();
+
+            QJsonArray optionsArray = data["options"].toArray();
+            for(const auto& option : optionsArray){
+                options << option.toString();
+            }
+        }
+    } else {
+        message = reply->errorString();
+    }
+
+    // options里面是答案，answer无用
     emit specificSingleSelectReceived(success, message, question, options, answer, subject);
 }
 
@@ -519,6 +650,91 @@ void NetworkManager::sendchangeMulSelectRequest(int ID,  // 修改问题需要�
     json["ID"] = ID;
     json["question"] = question;
     json["options"] = QJsonArray::fromStringList(options);
+    json["answer"] = answer;
+    json["subject"] = subject;
+    json["uploader"] = uploader;
+
+    // qDebug() << "json构建完成";
+
+    QNetworkReply *reply = m_networkManager->post(
+        request, QJsonDocument(json).toJson()
+        );
+
+    // 30秒超时定时器
+    QTimer *timeoutTimer = new QTimer(reply);
+    timeoutTimer->setSingleShot(true);
+    QObject::connect(timeoutTimer, &QTimer::timeout, [=]() {
+        reply->abort();  // 中止请求
+        reply->deleteLater();
+        emit changeSingleSelectFinished(false, "请求超时");
+    });
+    timeoutTimer->start(30000);  // 30秒超时
+
+    connect(reply, &QNetworkReply::finished, [=](){
+        timeoutTimer->stop();    // 请求完成时停止定时器
+        handlechangeSingleSelectResponse(reply);
+        reply->deleteLater();
+        timeoutTimer->deleteLater();
+    });
+}
+
+// 修改多选题功能————上传指定判断题数据
+void NetworkManager::sendchangeJudgeRequest(int ID,  // 修改问题需要指明问题ID
+                                                const QString &question,
+                                                int answer,
+                                                const QString &subject,
+                                                const QString &uploader)
+{
+    QUrl url(QString("%1/change_specific_judgequestion").arg(BASE_URL));
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QJsonObject json;
+    json["ID"] = ID;
+    json["question"] = question;
+    json["answer"] = answer;
+    json["subject"] = subject;
+    json["uploader"] = uploader;
+
+    // qDebug() << "json构建完成";
+
+    QNetworkReply *reply = m_networkManager->post(
+        request, QJsonDocument(json).toJson()
+        );
+
+    // 30秒超时定时器
+    QTimer *timeoutTimer = new QTimer(reply);
+    timeoutTimer->setSingleShot(true);
+    QObject::connect(timeoutTimer, &QTimer::timeout, [=]() {
+        reply->abort();  // 中止请求
+        reply->deleteLater();
+        emit changeSingleSelectFinished(false, "请求超时");
+    });
+    timeoutTimer->start(30000);  // 30秒超时
+
+    connect(reply, &QNetworkReply::finished, [=](){
+        timeoutTimer->stop();    // 请求完成时停止定时器
+        handlechangeSingleSelectResponse(reply);
+        reply->deleteLater();
+        timeoutTimer->deleteLater();
+    });
+}
+
+// 修改简答题功能————上传指定简答题数据
+void NetworkManager::sendchangeShortRequest(int ID,  // 修改问题需要指明问题ID
+                                            const QString &question,
+                                            const QString &answer,
+                                            const QString &subject,
+                                            const QString &uploader)
+{
+    QUrl url(QString("%1/change_specific_shortquestion").arg(BASE_URL));
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QJsonObject json;
+    json["ID"] = ID;
+    json["question"] = question;
+    // json["options"] = QJsonArray::fromStringList(options);
     json["answer"] = answer;
     json["subject"] = subject;
     json["uploader"] = uploader;

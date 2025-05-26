@@ -7,12 +7,17 @@
 #include <QDebug>
 #include "changesinglewindow.h"
 #include "changemulwindow.h"
+#include "changejudgewindow.h"
+#include "changeshortwindow.h"
 
 QuestionManageWindow::QuestionManageWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::QuestionManageWindow)
 {
     ui->setupUi(this);
+
+    // 设置表格为只读
+    ui->Question_TableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     // 设置表头自适应拉伸模式（平均填充）
     ui->Question_TableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -25,6 +30,8 @@ QuestionManageWindow::QuestionManageWindow(QWidget *parent)
             this, &QuestionManageWindow::handleQueryFinished);
 
     setWindowFlags(Qt::Window);
+
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 // 处理查询结果的函数
@@ -194,7 +201,7 @@ void QuestionManageWindow::on_change_pushButton_2_clicked()
         NetworkManager::instance().sendSpecificSingleSelectRequest(id);
 
     }else if(type == "多选题"){
-        /*服务器返回的单选题json格式，与单选题一致：
+        /*服务器返回的多选题json格式，与单选题一致：
         {
             "question": "这是题目内容",
             "options": ["选项1", "选项2", "选项3", "选项4"],
@@ -243,11 +250,90 @@ void QuestionManageWindow::on_change_pushButton_2_clicked()
         NetworkManager::instance().sendSpecificMulSelectRequest(id);
 
     }else if(type == "判断题"){
-        // 是判断题
+        /*服务器返回的判断题json格式：
+        {
+            "question": "这是题目内容",
+            "answer": 数字,
+            "subject": "这是学科",
+        }
+        */
+        // 使用id向服务器BASE_URL/specific_judgequestion请求对应题目的信息。并将信息进行保存在相应变量中
+        QString question;
+        int answer;
+        QString subject;
+
+        // 连接信号处理
+        auto conn = std::make_shared<QMetaObject::Connection>();
+        *conn = connect(&NetworkManager::instance(), &NetworkManager::specificSingleSelectReceived,
+                        this, [=](bool success, const QString &msg,
+                            const QString &q, const QStringList &opts,
+                            int ans, const QString &subj) mutable {
+
+                            if(success){
+                                // 保存获取到的题目信息
+                                question = q;
+                                answer = ans;
+                                subject = subj;
+
+                                // 打开一个新ChangeJudgeWindow窗口，并将保存的数据填入新窗口的对应部分。
+                                // 创建并填充修改窗口
+                                ChangeJudgeWindow *editWindow = new ChangeJudgeWindow(this);
+                                editWindow->initData(id.toInt(), question, answer, subject);
+                                editWindow->show();
+                            } else {
+                                qDebug() << "获取失败";
+                                QMessageBox::warning(this, "提示", "题目获取失败");
+                            }
+
+                            disconnect(*conn); // 断开信号连接
+                        });
+
+        // 发送请求
+        NetworkManager::instance().sendSpecificJudgeRequest(id);
 
     }else{
-        // 是简答题
+        /*服务器返回的判断题json格式：
+        {
+            "question": "这是题目内容",
+            "options": ["选项1"], // 其实是答案，为了复用单选题的返回格式所以放在options的第一个字符串内
+            "subject": "这是学科",
+        }
+        */
+        // 使用id向服务器BASE_URL/specific_mulquestion请求对应题目的信息。并将信息进行保存在相应变量中
+        // 使用id向服务器BASE_URL/specific_singlequestion请求对应题目的信息。并将信息进行保存在相应变量中
+        QString question;
+        QString option1;
+        QString subject;
 
+        // 连接信号处理
+        auto conn = std::make_shared<QMetaObject::Connection>();
+        *conn = connect(&NetworkManager::instance(), &NetworkManager::specificSingleSelectReceived,
+                        this, [=](bool success, const QString &msg,
+                            const QString &q, const QStringList &opts,
+                            int ans, const QString &subj) mutable {
+
+                            if(success){
+                                // 保存获取到的题目信息
+                                question = q;
+                                option1 = opts.value(0, "");
+                                subject = subj;
+
+                                // 打开一个新ChangeSingleWindow窗口，并将保存的数据question、option1-4、answer、subject填入新窗口的对应部分。
+                                // 创建并填充修改窗口
+                                ChangeShortWindow *editWindow = new ChangeShortWindow(this);
+                                QStringList options = {option1};
+                                editWindow->initData(id.toInt(), question, options, subject);
+                                editWindow->show();
+                            } else {
+                                qDebug() << "获取失败";
+                                QMessageBox::warning(this, "提示", "题目获取失败");
+                            }
+
+                            disconnect(*conn); // 断开信号连接
+                        });
+
+        // 发送请求
+        NetworkManager::instance().sendSpecificShortRequest(id);
     }
 
     setEnabled(true); // 恢复所有控件

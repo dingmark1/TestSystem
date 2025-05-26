@@ -9,6 +9,7 @@ SingleSelectWindow::SingleSelectWindow(QWidget *parent)
     , ui(new Ui::SingleSelectWindow)
 {
     ui->setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 SingleSelectWindow::~SingleSelectWindow()

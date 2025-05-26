@@ -11,6 +11,7 @@ ChangeSingleWindow::ChangeSingleWindow(QWidget *parent)
     , ui(new Ui::ChangeSingleWindow)
 {
     ui->setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 ChangeSingleWindow::~ChangeSingleWindow()

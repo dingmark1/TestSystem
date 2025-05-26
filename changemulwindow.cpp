@@ -11,6 +11,7 @@ ChangeMulWindow::ChangeMulWindow(QWidget *parent)
     , ui(new Ui::ChangeMulWindow)
 {
     ui->setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 ChangeMulWindow::~ChangeMulWindow()
@@ -69,7 +70,6 @@ void ChangeMulWindow::on_upload_pushButton_clicked()
                     this->close();
                 }
             });
-
 }
 
 // 填充数据

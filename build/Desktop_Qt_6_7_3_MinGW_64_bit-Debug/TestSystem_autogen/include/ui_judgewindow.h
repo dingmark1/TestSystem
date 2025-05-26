@@ -34,9 +34,11 @@ public:
     QGridLayout *gridLayout;
     QVBoxLayout *verticalLayout;
     QLabel *label_7;
+    QSpacerItem *verticalSpacer_2;
     QHBoxLayout *horizontalLayout_7;
     QLabel *label;
     QTextEdit *question_textEdit;
+    QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout_6;
     QHBoxLayout *horizontalLayout_5;
     QLabel *label_6;
@@ -66,6 +68,10 @@ public:
 
         verticalLayout->addWidget(label_7);
 
+        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer_2);
+
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setObjectName("horizontalLayout_7");
         label = new QLabel(centralwidget);
@@ -81,6 +87,10 @@ public:
 
 
         verticalLayout->addLayout(horizontalLayout_7);
+
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer);
 
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setObjectName("horizontalLayout_6");
@@ -127,8 +137,8 @@ public:
         verticalLayout->addLayout(horizontalLayout_6);
 
         verticalLayout->setStretch(0, 1);
-        verticalLayout->setStretch(1, 2);
-        verticalLayout->setStretch(2, 1);
+        verticalLayout->setStretch(2, 2);
+        verticalLayout->setStretch(4, 1);
 
         gridLayout->addLayout(verticalLayout, 0, 0, 1, 1);
 

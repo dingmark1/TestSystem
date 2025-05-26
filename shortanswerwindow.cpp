@@ -9,6 +9,8 @@ ShortAnswerWindow::ShortAnswerWindow(QWidget *parent)
     , ui(new Ui::ShortAnswerWindow)
 {
     ui->setupUi(this);
+
+    setAttribute(Qt::WA_DeleteOnClose);
 }
 
 ShortAnswerWindow::~ShortAnswerWindow()
