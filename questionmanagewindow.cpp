@@ -6,7 +6,7 @@
 #include <QMessageBox>
 #include <QDebug>
 #include "changesinglewindow.h"
-
+#include "changemulwindow.h"
 
 QuestionManageWindow::QuestionManageWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -153,7 +153,7 @@ void QuestionManageWindow::on_change_pushButton_2_clicked()
             "subject": "这是学科",
         }
         */
-       // TODO: 使用id向服务器BASE_URL/specific_singlequestion请求对应题目的信息。并将信息进行保存在相应变量中
+        // 使用id向服务器BASE_URL/specific_singlequestion请求对应题目的信息。并将信息进行保存在相应变量中
         QString question;
         QString option1, option2, option3, option4;
         int answer;
@@ -176,10 +176,7 @@ void QuestionManageWindow::on_change_pushButton_2_clicked()
                                 answer = ans;
                                 subject = subj;
 
-                                // TODO: 这里可以打开修改对话框并填充数据
-                                qDebug() << "获取成功";
-
-                                // TODO: 打开一个新ChangeSingleWindow窗口，并将保存的数据question、option1-4、answer、subject填入新窗口的对应部分。
+                                // 打开一个新ChangeSingleWindow窗口，并将保存的数据question、option1-4、answer、subject填入新窗口的对应部分。
                                 // 创建并填充修改窗口
                                 ChangeSingleWindow *editWindow = new ChangeSingleWindow(this);
                                 QStringList options = {option1, option2, option3, option4};
@@ -196,11 +193,54 @@ void QuestionManageWindow::on_change_pushButton_2_clicked()
         // 发送请求
         NetworkManager::instance().sendSpecificSingleSelectRequest(id);
 
-
-
-
     }else if(type == "多选题"){
-        // 是多选题
+        /*服务器返回的单选题json格式，与单选题一致：
+        {
+            "question": "这是题目内容",
+            "options": ["选项1", "选项2", "选项3", "选项4"],
+            "answer": 数字,
+            "subject": "这是学科",
+        }
+        */
+        // 使用id向服务器BASE_URL/specific_mulquestion请求对应题目的信息。并将信息进行保存在相应变量中
+        QString question;
+        QString option1, option2, option3, option4;
+        int answer;
+        QString subject;
+
+        // 连接信号处理
+        auto conn = std::make_shared<QMetaObject::Connection>();
+        *conn = connect(&NetworkManager::instance(), &NetworkManager::specificSingleSelectReceived,
+                        this, [=](bool success, const QString &msg,
+                            const QString &q, const QStringList &opts,
+                            int ans, const QString &subj) mutable {
+
+                            if(success){
+                                // 保存获取到的题目信息
+                                question = q;
+                                option1 = opts.value(0, "");
+                                option2 = opts.value(1, "");
+                                option3 = opts.value(2, "");
+                                option4 = opts.value(3, "");
+                                answer = ans;
+                                subject = subj;
+
+                                // 打开一个新ChangeSingleWindow窗口，并将保存的数据question、option1-4、answer、subject填入新窗口的对应部分。
+                                // 创建并填充修改窗口
+                                ChangeMulWindow *editWindow = new ChangeMulWindow(this);
+                                QStringList options = {option1, option2, option3, option4};
+                                editWindow->initData(id.toInt(), question, options, answer, subject);
+                                editWindow->show();
+                            } else {
+                                qDebug() << "获取失败";
+                                QMessageBox::warning(this, "提示", "题目获取失败");
+                            }
+
+                            disconnect(*conn); // 断开信号连接
+                        });
+
+        // 发送请求
+        NetworkManager::instance().sendSpecificMulSelectRequest(id);
 
     }else if(type == "判断题"){
         // 是判断题

@@ -28,10 +28,10 @@ void MulSelectWindow::on_upload_pushButton_clicked()
     QString option4 = ui->option4_textEdit_4->toPlainText();
     QStringList options = {option1, option2, option3, option4};
     QString subject = ui->subject_lineEdit->text();
-    int answer = ui->option1_checkBox->isChecked() * 16
-               + ui->option2_checkBox_2->isChecked() * 8
-               + ui->option3_checkBox_3->isChecked() * 4
-               + ui->option4_checkBox_4->isChecked() * 2;
+    int answer = ui->option1_checkBox->isChecked() * 8
+               + ui->option2_checkBox_2->isChecked() * 4
+               + ui->option3_checkBox_3->isChecked() * 2
+               + ui->option4_checkBox_4->isChecked() * 1;
 
     if (answer == 0 || question.isEmpty() || option1.isEmpty() || option2.isEmpty() || option3.isEmpty() || option4.isEmpty() || subject.isEmpty()) {
         QMessageBox::warning(this, "提示", "请确保题目完整");

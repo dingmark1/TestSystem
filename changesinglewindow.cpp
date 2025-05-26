@@ -18,6 +18,7 @@ ChangeSingleWindow::~ChangeSingleWindow()
     delete ui;
 }
 
+// 点击按钮，上传修改后的题目
 void ChangeSingleWindow::on_upload_pushButton_clicked()
 {
     ui->upload_pushButton->setEnabled(false);
@@ -97,6 +98,6 @@ void ChangeSingleWindow::initData(int ID, const QString &question, const QString
 
     ui->subject_lineEdit->setText(subject);
 
-    target_ID = ID;
+    target_ID = ID; // 这个ID来自于选中行中提取的信息。由于打开填充数据后，在上传时还会用到，所以用一个全局变量保存起来
 }
 

@@ -15,6 +15,9 @@ public:
     explicit JudgeWindow(QWidget *parent = nullptr);
     ~JudgeWindow();
 
+private slots:
+    void on_upload_pushButton_clicked();
+
 private:
     Ui::JudgeWindow *ui;
 };

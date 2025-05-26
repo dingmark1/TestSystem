@@ -38,6 +38,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         config.h
         changesinglewindow.h changesinglewindow.cpp changesinglewindow.ui
         studentwindow.h studentwindow.cpp studentwindow.ui
+        changemulwindow.h changemulwindow.cpp changemulwindow.ui
 
 
     )

@@ -43,7 +43,7 @@ public:
     QRadioButton *correct_radioButton;
     QRadioButton *fault_radioButton_2;
     QLabel *label_2;
-    QLineEdit *lineEdit;
+    QLineEdit *subject_lineEdit;
     QSpacerItem *horizontalSpacer;
     QPushButton *upload_pushButton;
     QMenuBar *menubar;
@@ -109,10 +109,10 @@ public:
 
         horizontalLayout_6->addWidget(label_2);
 
-        lineEdit = new QLineEdit(centralwidget);
-        lineEdit->setObjectName("lineEdit");
+        subject_lineEdit = new QLineEdit(centralwidget);
+        subject_lineEdit->setObjectName("subject_lineEdit");
 
-        horizontalLayout_6->addWidget(lineEdit);
+        horizontalLayout_6->addWidget(subject_lineEdit);
 
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 

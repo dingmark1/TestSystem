@@ -30,6 +30,18 @@ public:
                                     const QString &subject,
                                     const QString &uploader);
 
+    // 上传判断题
+    void sendAddJudgeRequest(const QString &question,
+                                    int answer,
+                                    const QString &subject,
+                                    const QString &uploader);
+
+    // 上传简答题
+    void sendAddShortAnswerRequest(const QString &question,
+                                    const QString &answer,
+                                    const QString &subject,
+                                    const QString &uploader);
+
     // 题目查询
     void sendQueryRequest(const QString &content, const QString &uploader);
 
@@ -39,8 +51,19 @@ public:
     // 修改————获取单选题数据
     void sendSpecificSingleSelectRequest(const QString &id);
 
+    // 修改————获取多选题数据
+    void sendSpecificMulSelectRequest(const QString &id);
+
     // 修改————上传单选题
     void sendchangeSingleSelectRequest(int ID,
+                                    const QString &question,
+                                    const QStringList &options,
+                                    int answer,
+                                    const QString &subject,
+                                    const QString &uploader);
+
+    // 修改————上传多选题
+    void sendchangeMulSelectRequest(int ID,
                                     const QString &question,
                                     const QStringList &options,
                                     int answer,
@@ -69,7 +92,7 @@ signals:
                        const QString &message,
                        const QJsonObject &data);
 
-    // 单选题上传完成信号
+    // 单选题上传完成信号(其他题也能用)
     void addSingleSelectFinished(bool success, const QString &message);
 
     // 题目查询
@@ -78,14 +101,15 @@ signals:
     // 题目删除完成信号
     void deleteFinished(bool success, const QString &message);
 
-    // 获取指定单选题目数据
+    // 获取指定单选题目数据完成信号
     void specificSingleSelectReceived(bool success, const QString &message,
                                       const QString &question,
                                       const QStringList &options,
                                       int answer,
                                       const QString &subject);
 
-    // 修改————上传单选题数据
+    // 修改————上传单选题数据的完成信号，其实也没用，直接用addSingleSelectFinished信号就行
+    // 不过为了格式统一，后续的所有修改功能的上传完成信号就都用这个了
     void changeSingleSelectFinished(bool success, const QString &message);
 
     // 用户查询完成信号
@@ -104,11 +128,11 @@ signals:
 private:
     explicit NetworkManager(QObject *parent = nullptr);
     void handleLoginResponse(QNetworkReply *reply);  // 处理登录响应
-    void handleAddSingleSelectResponse(QNetworkReply *reply);   //处理上传单选题的响应
+    void handleAddSingleSelectResponse(QNetworkReply *reply);   //处理上传单选题的响应（其他的题型也一样用）
     void handleQueryResponse(QNetworkReply *reply); // 处理题目查询
     void handleDeleteResponse(QNetworkReply *reply);// 处理题目删除
     void handleSpecificSingleSelectResponse(QNetworkReply *reply);  // 处理单选题数据响应
-    void handlechangeSingleSelectResponse(QNetworkReply *reply);//处理修改————上传单选题的响应
+    void handlechangeSingleSelectResponse(QNetworkReply *reply);//处理修改————上传单选题的响应,其实多余了，可以直接用上传题目的响应的
     void handleuserQueryResponse(QNetworkReply *reply); // 处理用户查询
     void handleuserDeleteResponse(QNetworkReply *reply);// 处理用户删除
     void handleuserAddResponse(QNetworkReply *reply);// 处理用户删除

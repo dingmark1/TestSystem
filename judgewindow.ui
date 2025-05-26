@@ -79,7 +79,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit"/>
+         <widget class="QLineEdit" name="subject_lineEdit"/>
         </item>
         <item>
          <spacer name="horizontalSpacer">

@@ -15,6 +15,9 @@ public:
     explicit ShortAnswerWindow(QWidget *parent = nullptr);
     ~ShortAnswerWindow();
 
+private slots:
+    void on_upload_pushButton_clicked();
+
 private:
     Ui::ShortAnswerWindow *ui;
 };

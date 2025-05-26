@@ -586,6 +586,8 @@ TestSystem_autogen/timestamp: \
 	C:/Users/ASUS/Documents/TestSystem/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.29.3/CMakeRCCompiler.cmake \
 	C:/Users/ASUS/Documents/TestSystem/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/CMakeFiles/3.29.3/CMakeSystem.cmake \
 	C:/Users/ASUS/Documents/TestSystem/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/TestSystem_autogen/moc_predefs.h \
+	C:/Users/ASUS/Documents/TestSystem/changemulwindow.cpp \
+	C:/Users/ASUS/Documents/TestSystem/changemulwindow.h \
 	C:/Users/ASUS/Documents/TestSystem/changesinglewindow.cpp \
 	C:/Users/ASUS/Documents/TestSystem/changesinglewindow.h \
 	C:/Users/ASUS/Documents/TestSystem/config.h \
@@ -617,6 +619,7 @@ TestSystem_autogen/timestamp: \
 	C:/Users/ASUS/Documents/TestSystem/usermanagewindow.cpp \
 	C:/Users/ASUS/Documents/TestSystem/usermanagewindow.h \
 	C:/Users/ASUS/Documents/TestSystem/administratorwindow.ui \
+	C:/Users/ASUS/Documents/TestSystem/changemulwindow.ui \
 	C:/Users/ASUS/Documents/TestSystem/changesinglewindow.ui \
 	C:/Users/ASUS/Documents/TestSystem/judgewindow.ui \
 	C:/Users/ASUS/Documents/TestSystem/mainwindow.ui \
