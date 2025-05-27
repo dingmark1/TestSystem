@@ -98,7 +98,7 @@ public:
     void senduserDeleteRequest(const QString &id);
 
     // 用户新增
-    void senduserAddRequest(const QString &name, const QString &type);
+    void senduserAddRequest(const QString &name, const QString &type, const QString &code);
 
     // 上传试卷
     void sendAddTestRequest(const QString &testName,

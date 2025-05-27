@@ -153,6 +153,16 @@ void UserManageWindow::on_pushButton_clicked()
         return;
     }
 
+    // 弹窗输入密码
+    QString code = QInputDialog::getText(this, "新建用户",
+                                         "请输入密码：",
+                                         QLineEdit::Normal,
+                                         "", &ok);
+    if (!ok || name.isEmpty()) {
+        QMessageBox::information(this, "提示", "操作取消");
+        return;
+    }
+
     disconnect(&NetworkManager::instance(), &NetworkManager::userAddFinished, this, nullptr);
 
     // 连接新增完成信号
@@ -171,7 +181,7 @@ void UserManageWindow::on_pushButton_clicked()
     setEnabled(false);
 
     // 发送新增请求
-    NetworkManager::instance().senduserAddRequest(name, type);
+    NetworkManager::instance().senduserAddRequest(name, type, code);
 
 }
 

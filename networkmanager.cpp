@@ -318,6 +318,8 @@ void NetworkManager::sendDeleteRequest(const QString &id)
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
+    // qDebug()<<"json_id: "<<id;
+
     QJsonObject json;
     json["id"] = id;
 
@@ -889,7 +891,7 @@ void NetworkManager::handleuserDeleteResponse(QNetworkReply *reply)
 
 // 用户新增功能实现
 // 发送新增请求
-void NetworkManager::senduserAddRequest(const QString &name, const QString &type)
+void NetworkManager::senduserAddRequest(const QString &name, const QString &type, const QString &code)
 {
     QUrl url(QString("%1/add_user").arg(BASE_URL));
     QNetworkRequest request(url);
@@ -898,6 +900,7 @@ void NetworkManager::senduserAddRequest(const QString &name, const QString &type
     QJsonObject json;
     json["name"] = name;
     json["type"] = type;
+    json["code"] = code;
 
     QNetworkReply *reply = m_networkManager->post(
         request, QJsonDocument(json).toJson()

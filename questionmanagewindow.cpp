@@ -94,6 +94,8 @@ void QuestionManageWindow::on_delete_pushButton_3_clicked()
     }
     QString id = ui->Question_TableWidget->item(currentRow, 0)->text();      // 第0列：题目ID
 
+    // qDebug()<<"id: "<<id;
+
     // 保险措施：弹出窗口询问是否删除
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "确认删除",
@@ -130,6 +132,7 @@ void QuestionManageWindow::on_delete_pushButton_3_clicked()
             });
 
     // 发送删除请求
+    qDebug()<<"id: "<<id;
     NetworkManager::instance().sendDeleteRequest(id);
 }
 
@@ -194,6 +197,8 @@ void QuestionManageWindow::on_change_pushButton_2_clicked()
                                 QMessageBox::warning(this, "提示", "题目获取失败");
                             }
 
+                            setEnabled(true); // 恢复所有控件
+
                             disconnect(*conn); // 断开信号连接
                         });
 
@@ -243,6 +248,8 @@ void QuestionManageWindow::on_change_pushButton_2_clicked()
                                 QMessageBox::warning(this, "提示", "题目获取失败");
                             }
 
+                            setEnabled(true); // 恢复所有控件
+
                             disconnect(*conn); // 断开信号连接
                         });
 
@@ -284,6 +291,8 @@ void QuestionManageWindow::on_change_pushButton_2_clicked()
                                 qDebug() << "获取失败";
                                 QMessageBox::warning(this, "提示", "题目获取失败");
                             }
+
+                            setEnabled(true); // 恢复所有控件
 
                             disconnect(*conn); // 断开信号连接
                         });
@@ -329,13 +338,13 @@ void QuestionManageWindow::on_change_pushButton_2_clicked()
                                 QMessageBox::warning(this, "提示", "题目获取失败");
                             }
 
+                            setEnabled(true); // 恢复所有控件
+
                             disconnect(*conn); // 断开信号连接
                         });
 
         // 发送请求
         NetworkManager::instance().sendSpecificShortRequest(id);
     }
-
-    setEnabled(true); // 恢复所有控件
 }
 
