@@ -237,7 +237,7 @@ public:
     void retranslateUi(QMainWindow *MulSelectWindow)
     {
         MulSelectWindow->setWindowTitle(QCoreApplication::translate("MulSelectWindow", "MainWindow", nullptr));
-        label_7->setText(QCoreApplication::translate("MulSelectWindow", "\345\215\225\351\241\271\351\200\211\346\213\251\351\242\230", nullptr));
+        label_7->setText(QCoreApplication::translate("MulSelectWindow", "\345\244\232\351\241\271\351\200\211\346\213\251\351\242\230", nullptr));
         label->setText(QCoreApplication::translate("MulSelectWindow", "\351\242\230   \347\233\256", nullptr));
         label_2->setText(QCoreApplication::translate("MulSelectWindow", "\351\200\211\351\241\271\344\270\200", nullptr));
         label_3->setText(QCoreApplication::translate("MulSelectWindow", "\351\200\211\351\241\271\344\272\214", nullptr));

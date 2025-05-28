@@ -7,6 +7,7 @@
 #include <QTimer>
 #include "config.h"
 #include <QDebug>
+#include<QNetworkProxy>
 
 //  #define BASE_URL "https://8b14e595-fe19-49fd-9640-d106c314eb26.mock.pstmn.io"   //  基础地址
 
@@ -18,6 +19,16 @@ NetworkManager::NetworkManager(QObject *parent)
     : QObject(parent),
     m_networkManager(new QNetworkAccessManager(this)) // 创建网络访问管理器
 {
+    // ============ Postman 代理设置开始 ============
+    // 需要抓包时取消注释，不需要时注释掉
+
+    // QNetworkProxy proxy;
+    // proxy.setType(QNetworkProxy::HttpProxy);
+    // proxy.setHostName("localhost");  // Postman代理地址
+    // proxy.setPort(5555);            // Postman代理默认端口
+    // m_networkManager->setProxy(proxy);  // 只对这个manager生效
+
+    // ============ Postman 代理设置结束 ============
 }
 
 // 单例访问方法
@@ -311,14 +322,14 @@ void NetworkManager::handleQueryResponse(QNetworkReply *reply) {
 }
 
 
-// 发送删除请求
+// 发送题目删除请求
 void NetworkManager::sendDeleteRequest(const QString &id)
 {
     QUrl url(QString("%1/delete_data").arg(BASE_URL));
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    // qDebug()<<"json_id: "<<id;
+    qDebug()<<"json_id: "<<id;
 
     QJsonObject json;
     json["id"] = id;
@@ -996,4 +1007,73 @@ void NetworkManager::handleAddTestResponse(QNetworkReply *reply)
     }
 
     emit addTestFinished(success, message);
+}
+
+// 请求AI
+void NetworkManager::sendAIRequest(const QString &prompt, const QString &questionType)
+{
+    QUrl url(QString("%1/AI_request").arg(BASE_URL));
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QJsonObject json;
+    json["prompt"] = prompt;
+    json["question_type"] = questionType;
+
+    QNetworkReply *reply = m_networkManager->post(
+        request, QJsonDocument(json).toJson()
+        );
+
+    // 30秒超时定时器
+    QTimer *timeoutTimer = new QTimer(reply);
+    timeoutTimer->setSingleShot(true);
+    QObject::connect(timeoutTimer, &QTimer::timeout, [=]() {
+        reply->abort();
+        reply->deleteLater();
+        emit aiRequestFinished_single(false, "请求超时", "", QStringList(), -1);
+    });
+    timeoutTimer->start(30000);
+
+    connect(reply, &QNetworkReply::finished, [=](){
+        timeoutTimer->stop();
+        handleAIResponse_single(reply);
+        reply->deleteLater();
+        timeoutTimer->deleteLater();
+    });
+}
+
+// 处理AI响应
+void NetworkManager::handleAIResponse_single(QNetworkReply *reply)
+{
+    bool success = false;
+    QString message, question;
+    QStringList options;
+    int answer = -1;
+
+    if(reply->error() == QNetworkReply::NoError){
+        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+        QJsonObject obj = doc.object();
+        int code = obj["code"].toInt();
+        message = obj["message"].toString();
+
+        qDebug()<<code<<message;
+
+        if(code == 200){
+            success = true;
+            QJsonObject data = obj["data"].toObject();
+            question = data["question"].toString();
+            answer = data["answer"].toInt();
+
+            qDebug()<<question;
+
+            QJsonArray optionsArray = data["options"].toArray();
+            for(const auto& option : optionsArray){
+                options << option.toString();
+            }
+        }
+    } else {
+        message = reply->errorString();
+    }
+
+    emit aiRequestFinished_single(success, message, question, options, answer);
 }

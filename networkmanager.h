@@ -105,6 +105,9 @@ public:
                             const QString &uploader,
                             const QJsonArray &questionIds);
 
+    // 请求AI
+    void sendAIRequest(const QString &prompt, const QString &questionType);
+
 
 
 signals:
@@ -145,6 +148,12 @@ signals:
     // 上传试卷
     void addTestFinished(bool success, const QString &message);
 
+    // AI生成单选题目完成信号
+    void aiRequestFinished_single(bool success, const QString &message,
+                           const QString &question,
+                           const QStringList &options,
+                           int answer);
+
 
 private:
     explicit NetworkManager(QObject *parent = nullptr);
@@ -167,6 +176,7 @@ private:
 
     void handleAddTestResponse(QNetworkReply *reply);// 处理试卷上传
 
+    void handleAIResponse_single(QNetworkReply *reply);// AI请求——单选题
 
     static NetworkManager* m_instance;  // 单例实例指针
     QNetworkAccessManager *m_networkManager;  // 网络访问管理器实例

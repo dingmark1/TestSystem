@@ -33,7 +33,13 @@ public:
     QWidget *centralwidget;
     QGridLayout *gridLayout;
     QVBoxLayout *verticalLayout;
+    QSpacerItem *verticalSpacer_2;
+    QHBoxLayout *horizontalLayout_8;
+    QSpacerItem *horizontalSpacer_2;
     QLabel *label_7;
+    QSpacerItem *horizontalSpacer_3;
+    QPushButton *pushButton;
+    QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout_7;
     QLabel *label;
     QTextEdit *question_textEdit;
@@ -74,11 +80,45 @@ public:
         gridLayout->setObjectName("gridLayout");
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName("verticalLayout");
+        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer_2);
+
+        horizontalLayout_8 = new QHBoxLayout();
+        horizontalLayout_8->setObjectName("horizontalLayout_8");
+        horizontalSpacer_2 = new QSpacerItem(37, 18, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_8->addItem(horizontalSpacer_2);
+
         label_7 = new QLabel(centralwidget);
         label_7->setObjectName("label_7");
         label_7->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
-        verticalLayout->addWidget(label_7);
+        horizontalLayout_8->addWidget(label_7);
+
+        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_8->addItem(horizontalSpacer_3);
+
+        pushButton = new QPushButton(centralwidget);
+        pushButton->setObjectName("pushButton");
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
+        pushButton->setSizePolicy(sizePolicy);
+
+        horizontalLayout_8->addWidget(pushButton);
+
+        horizontalLayout_8->setStretch(0, 2);
+        horizontalLayout_8->setStretch(2, 1);
+        horizontalLayout_8->setStretch(3, 1);
+
+        verticalLayout->addLayout(horizontalLayout_8);
+
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer);
 
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setObjectName("horizontalLayout_7");
@@ -210,15 +250,15 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_6);
 
-        verticalLayout->setStretch(0, 1);
-        verticalLayout->setStretch(1, 2);
-        verticalLayout->setStretch(2, 1);
-        verticalLayout->setStretch(3, 1);
+        verticalLayout->setStretch(1, 1);
+        verticalLayout->setStretch(3, 2);
         verticalLayout->setStretch(4, 1);
         verticalLayout->setStretch(5, 1);
         verticalLayout->setStretch(6, 1);
+        verticalLayout->setStretch(7, 1);
+        verticalLayout->setStretch(8, 1);
 
-        gridLayout->addLayout(verticalLayout, 2, 3, 1, 1);
+        gridLayout->addLayout(verticalLayout, 0, 0, 1, 1);
 
         SingleSelectWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(SingleSelectWindow);
@@ -238,6 +278,7 @@ public:
     {
         SingleSelectWindow->setWindowTitle(QCoreApplication::translate("SingleSelectWindow", "\344\270\212\344\274\240\345\215\225\351\200\211\351\242\230", nullptr));
         label_7->setText(QCoreApplication::translate("SingleSelectWindow", "\345\215\225\351\241\271\351\200\211\346\213\251\351\242\230", nullptr));
+        pushButton->setText(QCoreApplication::translate("SingleSelectWindow", "AI\345\212\251\346\211\213", nullptr));
         label->setText(QCoreApplication::translate("SingleSelectWindow", "\351\242\230   \347\233\256", nullptr));
         label_2->setText(QCoreApplication::translate("SingleSelectWindow", "\351\200\211\351\241\271\344\270\200", nullptr));
         label_3->setText(QCoreApplication::translate("SingleSelectWindow", "\351\200\211\351\241\271\344\272\214", nullptr));
