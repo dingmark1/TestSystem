@@ -19,10 +19,12 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your-super-secret-key-12345'
 db = SQLAlchemy(app)
 
+
 # ------------------ 数据库模型 ------------------
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
+    sid = db.Column(db.String(20), unique=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     user_type = db.Column(db.String(20), nullable=False)
@@ -38,6 +40,7 @@ class User(db.Model):
 class Question(db.Model):
     __tablename__ = 'questions'
     id = db.Column(db.Integer, primary_key=True)
+    sid = db.Column(db.String(20), unique=True)
     qtype = db.Column(db.String(20), nullable=False)  # single/multi/judge/short
     question = db.Column(db.Text, nullable=False)
     options = db.Column(JSON(none_as_null=True))
@@ -52,6 +55,7 @@ class Question(db.Model):
 class ExamPaper(db.Model):
     __tablename__ = 'exampapers'
     id = db.Column(db.Integer, primary_key=True)
+    sid = db.Column(db.String(20), unique=True)
     name = db.Column(db.String(200), nullable=False)
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -231,8 +235,10 @@ def handle_question(q_type):
             new_question.answer = data['answer']
         elif q_type == 'short':
             new_question.answer = data['answer']
-
+        
         db.session.add(new_question)
+        db.session.flush()
+        new_question.sid = str(new_question.id)
         db.session.commit()
         
         return jsonify(code=200, message="Question added successfully"), 200
@@ -266,7 +272,7 @@ def query_question():
             code=200,
             message="Success",
             data=[{
-                'id': q.id,
+                'id': q.sid,
                 'question': q.question,
                 'subject': q.subject,
                 'type': q.qtype
@@ -279,19 +285,36 @@ def query_question():
 def delete_data():
     try:
         data = request.get_json()
-        print(data)
-        if 'id' not in data:
-            return jsonify(code=400, message="Missing id"), 400
+        
+        # 参数校验增强
+        if 'id' not in data or not isinstance(data['id'], str) or not data['id'].strip():
+            return jsonify(code=400, message="Invalid or missing question ID"), 400
 
-        question = db.session.query(Questions).filter_by(id=data['id'])
-        if not quesion:
-            return jsonify(code=400, message="not found question"), 404
-        q = db.session.get(Question, question.id)
-        db.session.delete(q)
+        # 使用更规范的查询方式
+        question = Question.query.filter_by(sid=data['id'].strip()).first()
+        
+        if not question:
+            app.logger.warning(f"Question not found with sid: {data['id']}")
+            return jsonify(code=404, message="Question not found"), 404
+
+        # 直接使用已查询到的对象进行删除
+        db.session.delete(question)
         db.session.commit()
-        return jsonify(code=200, message="Deleted successfully"), 200
+        
+        app.logger.info(f"Deleted question: {data['id']}")
+        return jsonify(
+            code=200,
+            message="Deleted successfully",
+            deleted_id=data['id']
+        ), 200
+        
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error(f"Database error deleting question: {str(e)}")
+        return jsonify(code=500, message="Database operation failed"), 500
     except Exception as e:
-        return jsonify(code=500, message=str(e)), 500
+        app.logger.critical(f"Unexpected error: {str(e)}", exc_info=True)
+        return jsonify(code=500, message="Internal server error"), 500
 
 @app.route('/query_user', methods=['POST'])
 def query_user():
@@ -307,7 +330,8 @@ def query_user():
             code=200,
             message="Success",
             data=[{
-                'id': u.id,
+                #'id': str(u.id),
+                'id': u.sid,
                 'name': u.username,
                 'type': u.user_type,
                 'time': u.created_at
@@ -321,19 +345,29 @@ def query_user():
 def delete_user():
     try:
         data = request.get_json()
-        print(data)
-        if 'id' not in data:
-            return jsonify(code=400, message="Missing id"), 400
+        # 参数校验
+        if 'id' not in data or not data['id']:
+            return jsonify(code=400, message="Missing or invalid user id"), 400
 
-        user = db.session.query(User).filter_by(id=data['id'])
+        # 查询用户（使用正确的过滤方式）
+        user = User.query.filter_by(sid=data['id']).first()
+        
         if not user:
-            return jsonify(code=400, message="not found user"), 404
-        u = db.session.get(User, user.id)
-        db.session.delete(u)
+            return jsonify(code=404, message="User not found"), 404
+
+        # 直接删除用户对象
+        db.session.delete(user)
         db.session.commit()
+        
         return jsonify(code=200, message="Deleted successfully"), 200
+        
+    except SQLAlchemyError as e:  # 更精确的异常捕获
+        db.session.rollback()
+        app.logger.error(f"Database error: {str(e)}")
+        return jsonify(code=500, message="Database operation failed"), 500
     except Exception as e:
-        return jsonify(code=500, message=str(e)), 500
+        app.logger.error(f"Unexpected error: {str(e)}")
+        return jsonify(code=500, message="Internal server error"), 500
 
 @app.route('/add_user', methods=['POST'])
 def add_user():
@@ -347,11 +381,14 @@ def add_user():
             user_type=data['type'],
         )
         new_user.created_at = datetime.utcnow()
-
         new_user.set_password(data['code'])
 
+
         db.session.add(new_user)
+        db.session.flush()
+        new_user.sid = str(new_user.id)
         db.session.commit()
+        
         return jsonify(code=200, message="User created"), 200
     except Exception as e:
         return jsonify(code=500, message=str(e)), 500
@@ -636,9 +673,12 @@ def create_initial_user():
                 created_at=datetime.utcnow()
             )
             super_user.set_password("12345")  # 确保有set_password方法
+
             
             # 提交到数据库
             db.session.add(super_user)
+            db.session.flush()
+            super_user.sid = str(super_user.id)
             db.session.commit()
             print("Initial user created successfully!")
         else:
