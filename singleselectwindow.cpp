@@ -137,10 +137,10 @@ void SingleSelectWindow::on_pushButton_clicked()
     // 发送AI请求
     NetworkManager::instance().sendAIRequest(prompt, "single_select");
 
-    disconnect(&NetworkManager::instance(), &NetworkManager::aiRequestFinished_single, this, nullptr);
+    disconnect(&NetworkManager::instance(), &NetworkManager::aiRequestFinished, this, nullptr);
 
     // 连接信号处理响应
-    QObject::connect(&NetworkManager::instance(), &NetworkManager::aiRequestFinished_single,
+    QObject::connect(&NetworkManager::instance(), &NetworkManager::aiRequestFinished,
                      this, [=](bool success, const QString &msg,
                          const QString &question,
                          const QStringList &options,

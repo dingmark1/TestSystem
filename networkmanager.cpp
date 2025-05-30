@@ -1010,6 +1010,7 @@ void NetworkManager::handleAddTestResponse(QNetworkReply *reply)
 }
 
 // 请求AI
+// 所有种类的题目的AI请求都传向地址/AI_request，后端需要通过questionType进行区分并回传对应的题型的数据
 void NetworkManager::sendAIRequest(const QString &prompt, const QString &questionType)
 {
     QUrl url(QString("%1/AI_request").arg(BASE_URL));
@@ -1030,20 +1031,20 @@ void NetworkManager::sendAIRequest(const QString &prompt, const QString &questio
     QObject::connect(timeoutTimer, &QTimer::timeout, [=]() {
         reply->abort();
         reply->deleteLater();
-        emit aiRequestFinished_single(false, "请求超时", "", QStringList(), -1);
+        emit aiRequestFinished(false, "请求超时", "", QStringList(), -1);
     });
     timeoutTimer->start(30000);
 
     connect(reply, &QNetworkReply::finished, [=](){
         timeoutTimer->stop();
-        handleAIResponse_single(reply);
+        handleAIResponse(reply);
         reply->deleteLater();
         timeoutTimer->deleteLater();
     });
 }
 
-// 处理AI响应
-void NetworkManager::handleAIResponse_single(QNetworkReply *reply)
+// 处理AI响应——单选题，其他题也能用
+void NetworkManager::handleAIResponse(QNetworkReply *reply)
 {
     bool success = false;
     QString message, question;
@@ -1075,5 +1076,5 @@ void NetworkManager::handleAIResponse_single(QNetworkReply *reply)
         message = reply->errorString();
     }
 
-    emit aiRequestFinished_single(success, message, question, options, answer);
+    emit aiRequestFinished(success, message, question, options, answer);
 }

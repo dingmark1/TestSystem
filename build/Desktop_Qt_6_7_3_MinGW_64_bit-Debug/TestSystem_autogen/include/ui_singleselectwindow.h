@@ -34,9 +34,10 @@ public:
     QGridLayout *gridLayout;
     QVBoxLayout *verticalLayout;
     QSpacerItem *verticalSpacer_2;
-    QHBoxLayout *horizontalLayout_8;
+    QHBoxLayout *horizontalLayout_9;
     QSpacerItem *horizontalSpacer_2;
     QLabel *label_7;
+    QHBoxLayout *horizontalLayout_8;
     QSpacerItem *horizontalSpacer_3;
     QPushButton *pushButton;
     QSpacerItem *verticalSpacer;
@@ -84,37 +85,40 @@ public:
 
         verticalLayout->addItem(verticalSpacer_2);
 
-        horizontalLayout_8 = new QHBoxLayout();
-        horizontalLayout_8->setObjectName("horizontalLayout_8");
+        horizontalLayout_9 = new QHBoxLayout();
+        horizontalLayout_9->setObjectName("horizontalLayout_9");
         horizontalSpacer_2 = new QSpacerItem(37, 18, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
-        horizontalLayout_8->addItem(horizontalSpacer_2);
+        horizontalLayout_9->addItem(horizontalSpacer_2);
 
         label_7 = new QLabel(centralwidget);
         label_7->setObjectName("label_7");
         label_7->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
-        horizontalLayout_8->addWidget(label_7);
+        horizontalLayout_9->addWidget(label_7);
 
+        horizontalLayout_8 = new QHBoxLayout();
+        horizontalLayout_8->setObjectName("horizontalLayout_8");
         horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
         horizontalLayout_8->addItem(horizontalSpacer_3);
 
         pushButton = new QPushButton(centralwidget);
         pushButton->setObjectName("pushButton");
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Fixed);
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
         pushButton->setSizePolicy(sizePolicy);
+        pushButton->setMinimumSize(QSize(0, 0));
 
         horizontalLayout_8->addWidget(pushButton);
 
-        horizontalLayout_8->setStretch(0, 2);
-        horizontalLayout_8->setStretch(2, 1);
-        horizontalLayout_8->setStretch(3, 1);
 
-        verticalLayout->addLayout(horizontalLayout_8);
+        horizontalLayout_9->addLayout(horizontalLayout_8);
+
+
+        verticalLayout->addLayout(horizontalLayout_9);
 
         verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
@@ -250,7 +254,9 @@ public:
 
         verticalLayout->addLayout(horizontalLayout_6);
 
+        verticalLayout->setStretch(0, 1);
         verticalLayout->setStretch(1, 1);
+        verticalLayout->setStretch(2, 1);
         verticalLayout->setStretch(3, 2);
         verticalLayout->setStretch(4, 1);
         verticalLayout->setStretch(5, 1);

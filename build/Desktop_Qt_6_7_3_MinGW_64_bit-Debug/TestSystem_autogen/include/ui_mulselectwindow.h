@@ -33,7 +33,14 @@ public:
     QWidget *centralwidget;
     QGridLayout *gridLayout;
     QVBoxLayout *verticalLayout;
+    QSpacerItem *verticalSpacer;
+    QHBoxLayout *horizontalLayout_10;
+    QSpacerItem *horizontalSpacer_2;
     QLabel *label_7;
+    QHBoxLayout *horizontalLayout_9;
+    QSpacerItem *horizontalSpacer_3;
+    QPushButton *pushButton;
+    QSpacerItem *verticalSpacer_2;
     QHBoxLayout *horizontalLayout_7;
     QLabel *label;
     QTextEdit *question_textEdit;
@@ -74,11 +81,45 @@ public:
         gridLayout->setObjectName("gridLayout");
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName("verticalLayout");
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer);
+
+        horizontalLayout_10 = new QHBoxLayout();
+        horizontalLayout_10->setObjectName("horizontalLayout_10");
+        horizontalSpacer_2 = new QSpacerItem(138, 30, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_10->addItem(horizontalSpacer_2);
+
         label_7 = new QLabel(centralwidget);
         label_7->setObjectName("label_7");
         label_7->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
-        verticalLayout->addWidget(label_7);
+        horizontalLayout_10->addWidget(label_7);
+
+        horizontalLayout_9 = new QHBoxLayout();
+        horizontalLayout_9->setObjectName("horizontalLayout_9");
+        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_9->addItem(horizontalSpacer_3);
+
+        pushButton = new QPushButton(centralwidget);
+        pushButton->setObjectName("pushButton");
+
+        horizontalLayout_9->addWidget(pushButton);
+
+
+        horizontalLayout_10->addLayout(horizontalLayout_9);
+
+        horizontalLayout_10->setStretch(0, 1);
+        horizontalLayout_10->setStretch(1, 1);
+        horizontalLayout_10->setStretch(2, 1);
+
+        verticalLayout->addLayout(horizontalLayout_10);
+
+        verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer_2);
 
         horizontalLayout_7 = new QHBoxLayout();
         horizontalLayout_7->setObjectName("horizontalLayout_7");
@@ -211,12 +252,14 @@ public:
         verticalLayout->addLayout(horizontalLayout_6);
 
         verticalLayout->setStretch(0, 1);
-        verticalLayout->setStretch(1, 2);
+        verticalLayout->setStretch(1, 1);
         verticalLayout->setStretch(2, 1);
-        verticalLayout->setStretch(3, 1);
+        verticalLayout->setStretch(3, 2);
         verticalLayout->setStretch(4, 1);
         verticalLayout->setStretch(5, 1);
         verticalLayout->setStretch(6, 1);
+        verticalLayout->setStretch(7, 1);
+        verticalLayout->setStretch(8, 1);
 
         gridLayout->addLayout(verticalLayout, 0, 0, 1, 1);
 
@@ -238,6 +281,7 @@ public:
     {
         MulSelectWindow->setWindowTitle(QCoreApplication::translate("MulSelectWindow", "MainWindow", nullptr));
         label_7->setText(QCoreApplication::translate("MulSelectWindow", "\345\244\232\351\241\271\351\200\211\346\213\251\351\242\230", nullptr));
+        pushButton->setText(QCoreApplication::translate("MulSelectWindow", "AI\345\212\251\346\211\213", nullptr));
         label->setText(QCoreApplication::translate("MulSelectWindow", "\351\242\230   \347\233\256", nullptr));
         label_2->setText(QCoreApplication::translate("MulSelectWindow", "\351\200\211\351\241\271\344\270\200", nullptr));
         label_3->setText(QCoreApplication::translate("MulSelectWindow", "\351\200\211\351\241\271\344\272\214", nullptr));

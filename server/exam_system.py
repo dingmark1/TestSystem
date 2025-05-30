@@ -4,6 +4,8 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 import jwt
 from functools import wraps
+
+from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 from sqlalchemy.ext.associationproxy import association_proxy
