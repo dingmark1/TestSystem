@@ -175,7 +175,7 @@ private:
 
     void handleAddTestResponse(QNetworkReply *reply);// 处理试卷上传
 
-    void handleAIResponse(QNetworkReply *reply);// AI请求——单选题
+    void handleAIResponse(QNetworkReply *reply);// 处理AI请求
 
     static NetworkManager* m_instance;  // 单例实例指针
     QNetworkAccessManager *m_networkManager;  // 网络访问管理器实例

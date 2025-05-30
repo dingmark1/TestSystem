@@ -75,6 +75,8 @@ void MulSelectWindow::on_upload_pushButton_clicked()
 // AI助手调用
 void MulSelectWindow::on_pushButton_clicked()
 {
+    // 具体信息格式见singleselectwindow的AI请求部分
+
     QDialog dialog(this);
     dialog.setWindowTitle(tr("AI生成题目"));
 
@@ -118,36 +120,36 @@ void MulSelectWindow::on_pushButton_clicked()
 
     // 连接信号处理响应
     QObject::connect(&NetworkManager::instance(), &NetworkManager::aiRequestFinished,
-                     this, [=](bool success, const QString &msg,
-                         const QString &question,
-                         const QStringList &options,
-                         int answer) {
-                         waitBox->setText(success ? "  完成！ " : "题目生成失败，请重试");
-                         waitBox->setStandardButtons(QMessageBox::Ok);
+                    this, [=](bool success, const QString &msg,
+                        const QString &question,
+                        const QStringList &options,
+                        int answer) {
+                        waitBox->setText(success ? "  完成！ " : "题目生成失败，请重试");
+                        waitBox->setStandardButtons(QMessageBox::Ok);
 
-                         if (success) {
-                             // 填充生成的题目到UI
-                             ui->question_textEdit->setText(question);
-                             ui->option1_textEdit->setText(options.value(0, ""));
-                             ui->option2_textEdit_2->setText(options.value(1, ""));
-                             ui->option3_textEdit_3->setText(options.value(2, ""));
-                             ui->option4_textEdit_4->setText(options.value(3, ""));
+                        if (success) {
+                            // 填充生成的题目到UI
+                            ui->question_textEdit->setText(question);
+                            ui->option1_textEdit->setText(options.value(0, ""));
+                            ui->option2_textEdit_2->setText(options.value(1, ""));
+                            ui->option3_textEdit_3->setText(options.value(2, ""));
+                            ui->option4_textEdit_4->setText(options.value(3, ""));
 
-                             // 设置正确答案
-                             // 解码答案
-                             bool option1 = (answer & 8) != 0;
-                             bool option2 = (answer & 4) != 0;
-                             bool option3 = (answer & 2) != 0;
-                             bool option4 = (answer & 1) != 0;
+                            // 设置正确答案
+                            // 解码答案
+                            bool option1 = (answer & 8) != 0;
+                            bool option2 = (answer & 4) != 0;
+                            bool option3 = (answer & 2) != 0;
+                            bool option4 = (answer & 1) != 0;
 
-                             ui->option1_checkBox->setChecked(option1);
-                             ui->option2_checkBox_2->setChecked(option2);
-                             ui->option3_checkBox_3->setChecked(option3);
-                             ui->option4_checkBox_4->setChecked(option4);
-                         }
+                            ui->option1_checkBox->setChecked(option1);
+                            ui->option2_checkBox_2->setChecked(option2);
+                            ui->option3_checkBox_3->setChecked(option3);
+                            ui->option4_checkBox_4->setChecked(option4);
+                        }
 
-                         // 用户点击OK后删除对话框
-                         QObject::connect(waitBox, &QMessageBox::finished, waitBox, &QMessageBox::deleteLater);
-                     });
+                        // 用户点击OK后删除对话框
+                        QObject::connect(waitBox, &QMessageBox::finished, waitBox, &QMessageBox::deleteLater);
+                    });
 }
 

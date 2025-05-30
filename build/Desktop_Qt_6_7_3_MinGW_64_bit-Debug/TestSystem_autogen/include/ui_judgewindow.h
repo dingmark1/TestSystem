@@ -33,7 +33,13 @@ public:
     QWidget *centralwidget;
     QGridLayout *gridLayout;
     QVBoxLayout *verticalLayout;
+    QSpacerItem *verticalSpacer_3;
+    QHBoxLayout *horizontalLayout_2;
+    QSpacerItem *horizontalSpacer_3;
     QLabel *label_7;
+    QHBoxLayout *horizontalLayout;
+    QSpacerItem *horizontalSpacer_2;
+    QPushButton *pushButton;
     QSpacerItem *verticalSpacer_2;
     QHBoxLayout *horizontalLayout_7;
     QLabel *label;
@@ -62,11 +68,43 @@ public:
         gridLayout->setObjectName("gridLayout");
         verticalLayout = new QVBoxLayout();
         verticalLayout->setObjectName("verticalLayout");
+        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer_3);
+
+        horizontalLayout_2 = new QHBoxLayout();
+        horizontalLayout_2->setObjectName("horizontalLayout_2");
+        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout_2->addItem(horizontalSpacer_3);
+
         label_7 = new QLabel(centralwidget);
         label_7->setObjectName("label_7");
         label_7->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
-        verticalLayout->addWidget(label_7);
+        horizontalLayout_2->addWidget(label_7);
+
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName("horizontalLayout");
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        horizontalLayout->addItem(horizontalSpacer_2);
+
+        pushButton = new QPushButton(centralwidget);
+        pushButton->setObjectName("pushButton");
+        QSizePolicy sizePolicy(QSizePolicy::Policy::Fixed, QSizePolicy::Policy::Fixed);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(pushButton->sizePolicy().hasHeightForWidth());
+        pushButton->setSizePolicy(sizePolicy);
+
+        horizontalLayout->addWidget(pushButton);
+
+
+        horizontalLayout_2->addLayout(horizontalLayout);
+
+
+        verticalLayout->addLayout(horizontalLayout_2);
 
         verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
@@ -137,8 +175,11 @@ public:
         verticalLayout->addLayout(horizontalLayout_6);
 
         verticalLayout->setStretch(0, 1);
-        verticalLayout->setStretch(2, 2);
+        verticalLayout->setStretch(1, 2);
+        verticalLayout->setStretch(2, 1);
+        verticalLayout->setStretch(3, 3);
         verticalLayout->setStretch(4, 1);
+        verticalLayout->setStretch(5, 1);
 
         gridLayout->addLayout(verticalLayout, 0, 0, 1, 1);
 
@@ -160,6 +201,7 @@ public:
     {
         JudgeWindow->setWindowTitle(QCoreApplication::translate("JudgeWindow", "MainWindow", nullptr));
         label_7->setText(QCoreApplication::translate("JudgeWindow", "\345\210\244\346\226\255\351\242\230", nullptr));
+        pushButton->setText(QCoreApplication::translate("JudgeWindow", "AI\345\212\251\346\211\213", nullptr));
         label->setText(QCoreApplication::translate("JudgeWindow", "\351\242\230   \347\233\256", nullptr));
         label_6->setText(QCoreApplication::translate("JudgeWindow", "\347\255\224\346\241\210\357\274\232", nullptr));
         correct_radioButton->setText(QCoreApplication::translate("JudgeWindow", "\346\255\243\347\241\256", nullptr));
