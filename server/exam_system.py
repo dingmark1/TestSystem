@@ -9,6 +9,7 @@ import logging
 from sqlalchemy.ext.associationproxy import association_proxy
 from flask import g
 from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.exc import SQLAlchemyError
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -18,7 +19,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///exam.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your-super-secret-key-12345'
 db = SQLAlchemy(app)
-
 
 # ------------------ 数据库模型 ------------------
 class User(db.Model):
@@ -41,7 +41,7 @@ class Question(db.Model):
     __tablename__ = 'questions'
     id = db.Column(db.Integer, primary_key=True)
     sid = db.Column(db.String(20), unique=True)
-    qtype = db.Column(db.String(20), nullable=False)  # single/multi/judge/short
+    qtype = db.Column(db.String(20), nullable=False)  # 单选题/多选题/判断题/简答题
     question = db.Column(db.Text, nullable=False)
     options = db.Column(JSON(none_as_null=True))
     answer = db.Column(db.Text)
@@ -208,11 +208,11 @@ def handle_question(q_type):
         data = request.get_json()
         required = ['question', 'subject', 'uploader']
         
-        if q_type in ['single', 'multi']:
+        if q_type in ['单选题', '多选题']:
             required.extend(['options', 'answer'])
-        elif q_type == 'judge':
+        elif q_type == '判断题':
             required.append('answer')
-        elif q_type == 'short':
+        elif q_type == '简答题':
             required.append('answer')
         
         valid, msg = validate_required(data, required)
@@ -228,12 +228,12 @@ def handle_question(q_type):
             created_at = datetime.utcnow()
         )
 
-        if q_type in ['single', 'multi']:
+        if q_type in ['单选题', '多选题']:
             new_question.options = data['options']
             new_question.answer = data['answer']
-        elif q_type == 'judge':
+        elif q_type == '判断题':
             new_question.answer = data['answer']
-        elif q_type == 'short':
+        elif q_type == '简答题':
             new_question.answer = data['answer']
         
         db.session.add(new_question)
@@ -247,19 +247,19 @@ def handle_question(q_type):
 
 @app.route('/add_singleselect', methods=['POST'])
 def add_single_select():
-    return handle_question('single')
+    return handle_question('单选题')
 
 @app.route('/add_mulselect', methods=['POST'])
 def add_multi_select():
-    return handle_question('multi')
+    return handle_question('多选题')
 
 @app.route('/add_judge', methods=['POST'])
 def add_judge():
-    return handle_question('judge')
+    return handle_question('判断题')
 
 @app.route('/add_shortanswer', methods=['POST'])
 def add_short_answer():
-    return handle_question('short')
+    return handle_question('简答题')
 
 @app.route('/query_question', methods=['POST'])
 def query_question():
@@ -307,10 +307,242 @@ def delete_data():
             message="Deleted successfully",
             deleted_id=data['id']
         ), 200
-        
+
     except SQLAlchemyError as e:
         db.session.rollback()
         app.logger.error(f"Database error deleting question: {str(e)}")
+        return jsonify(code=500, message="Database operation failed"), 500
+    except Exception as e:
+        app.logger.critical(f"Unexpected error: {str(e)}", exc_info=True)
+        return jsonify(code=500, message="Internal server error"), 500
+
+@app.route('/specific_singlequestion', methods=['POST'])
+def get_modify_single():
+    try:
+        data = request.get_json()
+        if 'id' not in data:
+            return jsonify(code=400, message="missing question id"), 400
+        q = Question.query.filter_by(sid=data['id'].strip()).first()
+        if not q:
+            app.logger.warning(f"Question not found with id: {data['id']}")
+            return jsonify(code=404, message="Question not found"), 404
+        app.logger.info(f"get modify question: {data['id']}")
+        return jsonify(
+            code=200,
+            message="Success",
+            data={
+                'id': q.sid,
+                'question': q.question,
+                'subject': q.subject,
+                'answer': q.answer,
+                'options': q.options
+            }
+        )
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error(f"Database error modifying question: {str(e)}")
+        return jsonify(code=500, message="Database operation failed"), 500
+    except Exception as e:
+        app.logger.critical(f"Unexpected error: {str(e)}", exc_info=True)
+        return jsonify(code=500, message="Internal server error"), 500
+
+@app.route('/change_specific_singlequestion', methods=['POST'])
+def modify_single():
+    try:
+        data = request.get_json()
+        if 'ID' not in data:
+            return jsonify(code=400, message="missing question ID"), 400
+        question = Question.query.filter_by(id=data['ID']).first()
+        if not question:
+            app.logger.warning(f"Question not found with id: {data['ID']}")
+            return jsonify(code=404, message="Question not found"), 404
+        question.question = data['question']
+        question.options = data['options']
+        question.answer = data['answer']
+        question.subject = data['subject']
+        question.uploader = data['uploader']
+        db.session.commit()
+        app.logger.info(f"Modify question: {data['ID']}")
+        return jsonify(
+            code=200,
+            message="Modify successfully",
+        ), 200
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error(f"Database error modifying question: {str(e)}")
+        return jsonify(code=500, message="Database operation failed"), 500
+    except Exception as e:
+        app.logger.critical(f"Unexpected error: {str(e)}", exc_info=True)
+        return jsonify(code=500, message="Internal server error"), 500
+
+@app.route('/specific_mulquestion', methods=['POST'])
+def get_modify_multi():
+    try:
+        data = request.get_json()
+        if 'id' not in data:
+            return jsonify(code=400, message="missing question id"), 400
+        q = Question.query.filter_by(sid=data['id'].strip()).first()
+        if not q:
+            app.logger.warning(f"Question not found with id: {data['id']}")
+            return jsonify(code=404, message="Question not found"), 404
+        app.logger.info(f"get modify question: {data['id']}")
+        return jsonify(
+            code=200,
+            message="Success",
+            data={
+                'id': q.sid,
+                'question': q.question,
+                'subject': q.subject,
+                'answer': q.answer,
+                'options': q.options
+            }
+        )
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error(f"Database error modifying question: {str(e)}")
+        return jsonify(code=500, message="Database operation failed"), 500
+    except Exception as e:
+        app.logger.critical(f"Unexpected error: {str(e)}", exc_info=True)
+        return jsonify(code=500, message="Internal server error"), 500
+
+@app.route('/change_specific_mulquestion', methods=['POST'])
+def modify_multi():
+    try:
+        data = request.get_json()
+        if 'ID' not in data:
+            return jsonify(code=400, message="missing question ID"), 400
+        question = Question.query.filter_by(id=data['ID']).first()
+        if not question:
+            app.logger.warning(f"Question not found with id: {data['ID']}")
+            return jsonify(code=404, message="Question not found"), 404
+        question.question = data['question']
+        question.options = data['options']
+        question.answer = data['answer']
+        question.subject = data['subject']
+        question.uploader = data['uploader']
+        db.session.commit()
+        app.logger.info(f"Modify question: {data['ID']}")
+        return jsonify(
+            code=200,
+            message="Modify successfully",
+        ), 200
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error(f"Database error modifying question: {str(e)}")
+        return jsonify(code=500, message="Database operation failed"), 500
+    except Exception as e:
+        app.logger.critical(f"Unexpected error: {str(e)}", exc_info=True)
+        return jsonify(code=500, message="Internal server error"), 500
+
+@app.route('/specific_judgequestion', methods=['POST'])
+def get_modify_judge():
+    try:
+        data = request.get_json()
+        if 'id' not in data:
+            return jsonify(code=400, message="missing question id"), 400
+        q = Question.query.filter_by(sid=data['id'].strip()).first()
+        if not q:
+            app.logger.warning(f"Question not found with id: {data['id']}")
+            return jsonify(code=404, message="Question not found"), 404
+        app.logger.info(f"get modify question: {data['id']}")
+        return jsonify(
+            code=200,
+            message="Success",
+            data={
+                'id': q.sid,
+                'question': q.question,
+                'subject': q.subject,
+                'answer': q.answer
+            }
+        )
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error(f"Database error modifying question: {str(e)}")
+        return jsonify(code=500, message="Database operation failed"), 500
+    except Exception as e:
+        app.logger.critical(f"Unexpected error: {str(e)}", exc_info=True)
+        return jsonify(code=500, message="Internal server error"), 500
+
+@app.route('/change_specific_judgequestion', methods=['POST'])
+def modify_judge():
+    try:
+        data = request.get_json()
+        if 'ID' not in data:
+            return jsonify(code=400, message="missing question ID"), 400
+        question = Question.query.filter_by(id=data['ID']).first()
+        if not question:
+            app.logger.warning(f"Question not found with id: {data['ID']}")
+            return jsonify(code=404, message="Question not found"), 404
+        question.question = data['question']
+        question.answer = data['answer']
+        question.subject = data['subject']
+        question.uploader = data['uploader']
+        db.session.commit()
+        app.logger.info(f"Modify question: {data['ID']}")
+        return jsonify(
+            code=200,
+            message="Modify successfully",
+        ), 200
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error(f"Database error modifying question: {str(e)}")
+        return jsonify(code=500, message="Database operation failed"), 500
+    except Exception as e:
+        app.logger.critical(f"Unexpected error: {str(e)}", exc_info=True)
+        return jsonify(code=500, message="Internal server error"), 500
+
+@app.route('/specific_shortquestion', methods=['POST'])
+def get_modify_short():
+    try:
+        data = request.get_json()
+        if 'id' not in data:
+            return jsonify(code=400, message="missing question id"), 400
+        q = Question.query.filter_by(sid=data['id'].strip()).first()
+        if not q:
+            app.logger.warning(f"Question not found with id: {data['id']}")
+            return jsonify(code=404, message="Question not found"), 404
+        app.logger.info(f"get modify question: {data['id']}")
+        return jsonify(
+            code=200,
+            message="Success",
+            data={
+                'id': q.sid,
+                'question': q.question,
+                'subject': q.subject,
+                'answer': q.answer,
+            }
+        )
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error(f"Database error modifying question: {str(e)}")
+        return jsonify(code=500, message="Database operation failed"), 500
+    except Exception as e:
+        app.logger.critical(f"Unexpected error: {str(e)}", exc_info=True)
+        return jsonify(code=500, message="Internal server error"), 500
+
+@app.route('/change_specific_shortquestion', methods=['POST'])
+def modify_short():
+    try:
+        data = request.get_json()
+        if 'ID' not in data:
+            return jsonify(code=400, message="missing question ID"), 400
+        question = Question.query.filter_by(id=data['ID']).first()
+        if not question:
+            app.logger.warning(f"Question not found with id: {data['ID']}")
+            return jsonify(code=404, message="Question not found"), 404
+        question.question = data['question']
+        question.answer = data['answer']
+        question.subject = data['subject']
+        question.uploader = data['uploader']
+        db.session.commit()
+        app.logger.info(f"Modify question: {data['ID']}")
+        return jsonify(
+            code=200,
+            message="Modify successfully",
+        ), 200
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error(f"Database error modifying question: {str(e)}")
         return jsonify(code=500, message="Database operation failed"), 500
     except Exception as e:
         app.logger.critical(f"Unexpected error: {str(e)}", exc_info=True)
