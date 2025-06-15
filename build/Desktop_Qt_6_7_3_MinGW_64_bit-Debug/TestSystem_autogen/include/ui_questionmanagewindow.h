@@ -130,7 +130,7 @@ public:
 
     void retranslateUi(QMainWindow *QuestionManageWindow)
     {
-        QuestionManageWindow->setWindowTitle(QCoreApplication::translate("QuestionManageWindow", "MainWindow", nullptr));
+        QuestionManageWindow->setWindowTitle(QCoreApplication::translate("QuestionManageWindow", "\351\242\230\347\233\256\347\256\241\347\220\206", nullptr));
         QTableWidgetItem *___qtablewidgetitem = Question_TableWidget->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("QuestionManageWindow", "\351\242\230\347\233\256id", nullptr));
         QTableWidgetItem *___qtablewidgetitem1 = Question_TableWidget->horizontalHeaderItem(1);

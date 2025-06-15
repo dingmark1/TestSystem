@@ -36,6 +36,8 @@ public:
     QPushButton *upload_pushButton;
     QSpacerItem *verticalSpacer;
     QPushButton *manage_pushButton_2;
+    QSpacerItem *verticalSpacer_3;
+    QPushButton *pushButton;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -80,6 +82,15 @@ public:
 
         verticalLayout->addWidget(manage_pushButton_2);
 
+        verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+
+        verticalLayout->addItem(verticalSpacer_3);
+
+        pushButton = new QPushButton(layoutWidget);
+        pushButton->setObjectName("pushButton");
+
+        verticalLayout->addWidget(pushButton);
+
         verticalLayout->setStretch(1, 1);
         verticalLayout->setStretch(2, 1);
 
@@ -105,10 +116,11 @@ public:
 
     void retranslateUi(QMainWindow *TeacherWindow)
     {
-        TeacherWindow->setWindowTitle(QCoreApplication::translate("TeacherWindow", "MainWindow", nullptr));
+        TeacherWindow->setWindowTitle(QCoreApplication::translate("TeacherWindow", "\346\225\231\345\270\210\345\212\237\350\203\275", nullptr));
         label->setText(QCoreApplication::translate("TeacherWindow", "\351\242\230\345\272\223\347\256\241\347\220\206\347\263\273\347\273\237-\346\225\231\345\270\210\347\211\210", nullptr));
         upload_pushButton->setText(QCoreApplication::translate("TeacherWindow", "\351\242\230\347\233\256\344\270\212\344\274\240", nullptr));
         manage_pushButton_2->setText(QCoreApplication::translate("TeacherWindow", "\351\242\230\347\233\256\347\256\241\347\220\206", nullptr));
+        pushButton->setText(QCoreApplication::translate("TeacherWindow", "\346\237\245\347\234\213\350\257\225\345\215\267", nullptr));
     } // retranslateUi
 
 };

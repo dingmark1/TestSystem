@@ -108,7 +108,13 @@ public:
     // 请求AI
     void sendAIRequest(const QString &prompt, const QString &questionType);
 
+    // 查询试卷
+    void sendTestQueryRequest(const QString &content, const QString &uploader);
 
+    // 查询指定试卷的题目
+    void sendTestQuestionQueryRequest(const QString &testId);
+
+    void sendDownloadTestRequest(const QStringList &testIds);
 
 signals:
     // 登录完成信号
@@ -154,6 +160,14 @@ signals:
                            const QStringList &options,
                            int answer);
 
+    // 查询试卷信号
+    void testQueryFinished(bool success, const QString &message, const QJsonArray &testList);
+
+    // 指定试卷的题目查询信号
+    void testQuestionQueryFinished(bool success, const QString &message, const QJsonArray &questionList);
+
+    void downloadTestFinished(bool success, const QString &message, const QJsonArray &questionData);
+
 private:
     explicit NetworkManager(QObject *parent = nullptr);
     void handleLoginResponse(QNetworkReply *reply);  // 处理登录响应
@@ -176,6 +190,10 @@ private:
     void handleAddTestResponse(QNetworkReply *reply);// 处理试卷上传
 
     void handleAIResponse(QNetworkReply *reply);// 处理AI请求
+
+    void handleTestQueryResponse(QNetworkReply *reply); // 处理试卷查询请求
+    void handleTestQuestionQueryResponse(QNetworkReply *reply); // 处理指定试卷的题目查询
+    void handleDownloadTestResponse(QNetworkReply *reply);
 
     static NetworkManager* m_instance;  // 单例实例指针
     QNetworkAccessManager *m_networkManager;  // 网络访问管理器实例

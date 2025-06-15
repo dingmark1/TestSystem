@@ -236,7 +236,7 @@ public:
 
     void retranslateUi(QMainWindow *ChangeMulWindow)
     {
-        ChangeMulWindow->setWindowTitle(QCoreApplication::translate("ChangeMulWindow", "MainWindow", nullptr));
+        ChangeMulWindow->setWindowTitle(QCoreApplication::translate("ChangeMulWindow", "\344\277\256\346\224\271\351\242\230\347\233\256", nullptr));
         label_7->setText(QCoreApplication::translate("ChangeMulWindow", "\345\215\225\351\241\271\351\200\211\346\213\251\351\242\230", nullptr));
         label->setText(QCoreApplication::translate("ChangeMulWindow", "\351\242\230   \347\233\256", nullptr));
         label_2->setText(QCoreApplication::translate("ChangeMulWindow", "\351\200\211\351\241\271\344\270\200", nullptr));

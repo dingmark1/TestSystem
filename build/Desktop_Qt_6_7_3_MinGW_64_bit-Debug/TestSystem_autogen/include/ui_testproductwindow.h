@@ -158,7 +158,7 @@ public:
 
     void retranslateUi(QMainWindow *TestProductWindow)
     {
-        TestProductWindow->setWindowTitle(QCoreApplication::translate("TestProductWindow", "MainWindow", nullptr));
+        TestProductWindow->setWindowTitle(QCoreApplication::translate("TestProductWindow", "\347\273\204\345\215\267\345\212\237\350\203\275", nullptr));
         QTableWidgetItem *___qtablewidgetitem = Question_TableWidget->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("TestProductWindow", "\351\242\230\347\233\256id", nullptr));
         QTableWidgetItem *___qtablewidgetitem1 = Question_TableWidget->horizontalHeaderItem(1);

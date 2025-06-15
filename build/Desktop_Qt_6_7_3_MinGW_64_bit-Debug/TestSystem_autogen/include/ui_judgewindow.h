@@ -199,7 +199,7 @@ public:
 
     void retranslateUi(QMainWindow *JudgeWindow)
     {
-        JudgeWindow->setWindowTitle(QCoreApplication::translate("JudgeWindow", "MainWindow", nullptr));
+        JudgeWindow->setWindowTitle(QCoreApplication::translate("JudgeWindow", "\345\210\244\346\226\255\351\242\230", nullptr));
         label_7->setText(QCoreApplication::translate("JudgeWindow", "\345\210\244\346\226\255\351\242\230", nullptr));
         pushButton->setText(QCoreApplication::translate("JudgeWindow", "AI\345\212\251\346\211\213", nullptr));
         label->setText(QCoreApplication::translate("JudgeWindow", "\351\242\230   \347\233\256", nullptr));

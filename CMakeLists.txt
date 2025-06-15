@@ -9,7 +9,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets AxContainer)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network)
 
 set(PROJECT_SOURCES
@@ -41,6 +41,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         changemulwindow.h changemulwindow.cpp changemulwindow.ui
         changejudgewindow.h changejudgewindow.cpp changejudgewindow.ui
         changeshortwindow.h changeshortwindow.cpp changeshortwindow.ui
+        testview.h testview.cpp testview.ui
 
 
     )

@@ -56,7 +56,12 @@ constexpr auto qt_meta_stringdata_CLASSNetworkManagerENDCLASS = QtMocHelpers::st
     "userdeleteFinished",
     "userAddFinished",
     "addTestFinished",
-    "aiRequestFinished"
+    "aiRequestFinished",
+    "testQueryFinished",
+    "testList",
+    "testQuestionQueryFinished",
+    "downloadTestFinished",
+    "questionData"
 );
 #else  // !QT_MOC_HAS_STRINGDATA
 #error "qtmochelpers.h not found or too old."
@@ -69,25 +74,28 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSNetworkManagerENDCLASS[] = {
       12,       // revision
        0,       // classname
        0,    0, // classinfo
-      11,   14, // methods
+      14,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-      11,       // signalCount
+      14,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    3,   80,    2, 0x06,    1 /* Public */,
-       6,    2,   87,    2, 0x06,    5 /* Public */,
-       7,    3,   92,    2, 0x06,    8 /* Public */,
-       9,    2,   99,    2, 0x06,   12 /* Public */,
-      10,    6,  104,    2, 0x06,   15 /* Public */,
-      15,    2,  117,    2, 0x06,   22 /* Public */,
-      16,    3,  122,    2, 0x06,   25 /* Public */,
-      17,    2,  129,    2, 0x06,   29 /* Public */,
-      18,    2,  134,    2, 0x06,   32 /* Public */,
-      19,    2,  139,    2, 0x06,   35 /* Public */,
-      20,    5,  144,    2, 0x06,   38 /* Public */,
+       1,    3,   98,    2, 0x06,    1 /* Public */,
+       6,    2,  105,    2, 0x06,    5 /* Public */,
+       7,    3,  110,    2, 0x06,    8 /* Public */,
+       9,    2,  117,    2, 0x06,   12 /* Public */,
+      10,    6,  122,    2, 0x06,   15 /* Public */,
+      15,    2,  135,    2, 0x06,   22 /* Public */,
+      16,    3,  140,    2, 0x06,   25 /* Public */,
+      17,    2,  147,    2, 0x06,   29 /* Public */,
+      18,    2,  152,    2, 0x06,   32 /* Public */,
+      19,    2,  157,    2, 0x06,   35 /* Public */,
+      20,    5,  162,    2, 0x06,   38 /* Public */,
+      21,    3,  173,    2, 0x06,   44 /* Public */,
+      23,    3,  180,    2, 0x06,   48 /* Public */,
+      24,    3,  187,    2, 0x06,   52 /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::Bool, QMetaType::QString, QMetaType::QJsonObject,    3,    4,    5,
@@ -101,6 +109,9 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSNetworkManagerENDCLASS[] = {
     QMetaType::Void, QMetaType::Bool, QMetaType::QString,    3,    4,
     QMetaType::Void, QMetaType::Bool, QMetaType::QString,    3,    4,
     QMetaType::Void, QMetaType::Bool, QMetaType::QString, QMetaType::QString, QMetaType::QStringList, QMetaType::Int,    3,    4,   11,   12,   13,
+    QMetaType::Void, QMetaType::Bool, QMetaType::QString, QMetaType::QJsonArray,    3,    4,   22,
+    QMetaType::Void, QMetaType::Bool, QMetaType::QString, QMetaType::QJsonArray,    3,    4,    8,
+    QMetaType::Void, QMetaType::Bool, QMetaType::QString, QMetaType::QJsonArray,    3,    4,   25,
 
        0        // eod
 };
@@ -167,7 +178,22 @@ Q_CONSTINIT const QMetaObject NetworkManager::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
         QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
         QtPrivate::TypeAndForceComplete<const QStringList &, std::false_type>,
-        QtPrivate::TypeAndForceComplete<int, std::false_type>
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        // method 'testQueryFinished'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<bool, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QJsonArray &, std::false_type>,
+        // method 'testQuestionQueryFinished'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<bool, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QJsonArray &, std::false_type>,
+        // method 'downloadTestFinished'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<bool, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QJsonArray &, std::false_type>
     >,
     nullptr
 } };
@@ -189,6 +215,9 @@ void NetworkManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         case 8: _t->userAddFinished((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[2]))); break;
         case 9: _t->addTestFinished((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[2]))); break;
         case 10: _t->aiRequestFinished((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[3])),(*reinterpret_cast< std::add_pointer_t<QStringList>>(_a[4])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[5]))); break;
+        case 11: _t->testQueryFinished((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<QJsonArray>>(_a[3]))); break;
+        case 12: _t->testQuestionQueryFinished((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<QJsonArray>>(_a[3]))); break;
+        case 13: _t->downloadTestFinished((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QString>>(_a[2])),(*reinterpret_cast< std::add_pointer_t<QJsonArray>>(_a[3]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -270,6 +299,27 @@ void NetworkManager::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
                 return;
             }
         }
+        {
+            using _t = void (NetworkManager::*)(bool , const QString & , const QJsonArray & );
+            if (_t _q_method = &NetworkManager::testQueryFinished; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 11;
+                return;
+            }
+        }
+        {
+            using _t = void (NetworkManager::*)(bool , const QString & , const QJsonArray & );
+            if (_t _q_method = &NetworkManager::testQuestionQueryFinished; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 12;
+                return;
+            }
+        }
+        {
+            using _t = void (NetworkManager::*)(bool , const QString & , const QJsonArray & );
+            if (_t _q_method = &NetworkManager::downloadTestFinished; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 13;
+                return;
+            }
+        }
     }
 }
 
@@ -292,13 +342,13 @@ int NetworkManager::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 11)
+        if (_id < 14)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 11;
+        _id -= 14;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 11)
+        if (_id < 14)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 11;
+        _id -= 14;
     }
     return _id;
 }
@@ -378,5 +428,26 @@ void NetworkManager::aiRequestFinished(bool _t1, const QString & _t2, const QStr
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t3))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t4))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t5))) };
     QMetaObject::activate(this, &staticMetaObject, 10, _a);
+}
+
+// SIGNAL 11
+void NetworkManager::testQueryFinished(bool _t1, const QString & _t2, const QJsonArray & _t3)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t3))) };
+    QMetaObject::activate(this, &staticMetaObject, 11, _a);
+}
+
+// SIGNAL 12
+void NetworkManager::testQuestionQueryFinished(bool _t1, const QString & _t2, const QJsonArray & _t3)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t3))) };
+    QMetaObject::activate(this, &staticMetaObject, 12, _a);
+}
+
+// SIGNAL 13
+void NetworkManager::downloadTestFinished(bool _t1, const QString & _t2, const QJsonArray & _t3)
+{
+    void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t2))), const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t3))) };
+    QMetaObject::activate(this, &staticMetaObject, 13, _a);
 }
 QT_WARNING_POP

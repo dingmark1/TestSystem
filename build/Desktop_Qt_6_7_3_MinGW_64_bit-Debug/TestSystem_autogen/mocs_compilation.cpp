@@ -14,5 +14,6 @@
 #include "EWIEGA46WW/moc_studentwindow.cpp"
 #include "EWIEGA46WW/moc_teacherwindow.cpp"
 #include "EWIEGA46WW/moc_testproductwindow.cpp"
+#include "EWIEGA46WW/moc_testview.cpp"
 #include "EWIEGA46WW/moc_uploadquestionwindow.cpp"
 #include "EWIEGA46WW/moc_usermanagewindow.cpp"

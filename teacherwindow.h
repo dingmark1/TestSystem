@@ -20,6 +20,8 @@ private slots:
 
     void on_upload_pushButton_clicked();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::TeacherWindow *ui;
 };

@@ -144,7 +144,7 @@ public:
 
     void retranslateUi(QMainWindow *ChangeShortWindow)
     {
-        ChangeShortWindow->setWindowTitle(QCoreApplication::translate("ChangeShortWindow", "MainWindow", nullptr));
+        ChangeShortWindow->setWindowTitle(QCoreApplication::translate("ChangeShortWindow", "\344\277\256\346\224\271\351\242\230\347\233\256", nullptr));
         label_7->setText(QCoreApplication::translate("ChangeShortWindow", "\347\256\200\347\255\224\351\242\230", nullptr));
         label->setText(QCoreApplication::translate("ChangeShortWindow", "\351\242\230  \347\233\256", nullptr));
         label_2->setText(QCoreApplication::translate("ChangeShortWindow", "\347\255\224  \346\241\210", nullptr));

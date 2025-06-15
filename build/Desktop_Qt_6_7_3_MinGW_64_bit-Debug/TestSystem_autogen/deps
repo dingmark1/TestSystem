@@ -616,6 +616,8 @@ TestSystem_autogen/timestamp: \
 	C:/Users/ASUS/Documents/TestSystem/teacherwindow.h \
 	C:/Users/ASUS/Documents/TestSystem/testproductwindow.cpp \
 	C:/Users/ASUS/Documents/TestSystem/testproductwindow.h \
+	C:/Users/ASUS/Documents/TestSystem/testview.cpp \
+	C:/Users/ASUS/Documents/TestSystem/testview.h \
 	C:/Users/ASUS/Documents/TestSystem/uploadquestionwindow.cpp \
 	C:/Users/ASUS/Documents/TestSystem/uploadquestionwindow.h \
 	C:/Users/ASUS/Documents/TestSystem/userinfomanager.cpp \
@@ -636,6 +638,7 @@ TestSystem_autogen/timestamp: \
 	C:/Users/ASUS/Documents/TestSystem/studentwindow.ui \
 	C:/Users/ASUS/Documents/TestSystem/teacherwindow.ui \
 	C:/Users/ASUS/Documents/TestSystem/testproductwindow.ui \
+	C:/Users/ASUS/Documents/TestSystem/testview.ui \
 	C:/Users/ASUS/Documents/TestSystem/uploadquestionwindow.ui \
 	C:/Users/ASUS/Documents/TestSystem/usermanagewindow.ui \
 	C:/Qt/Tools/CMake_64/bin/cmake.exe

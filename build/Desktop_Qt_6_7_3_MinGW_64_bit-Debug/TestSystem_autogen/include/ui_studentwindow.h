@@ -26,7 +26,7 @@ class Ui_StudentWindow
 {
 public:
     QWidget *centralwidget;
-    QWidget *widget;
+    QWidget *layoutWidget;
     QVBoxLayout *verticalLayout;
     QLabel *label;
     QSpacerItem *verticalSpacer;
@@ -43,13 +43,13 @@ public:
         StudentWindow->resize(800, 600);
         centralwidget = new QWidget(StudentWindow);
         centralwidget->setObjectName("centralwidget");
-        widget = new QWidget(centralwidget);
-        widget->setObjectName("widget");
-        widget->setGeometry(QRect(270, 160, 201, 191));
-        verticalLayout = new QVBoxLayout(widget);
+        layoutWidget = new QWidget(centralwidget);
+        layoutWidget->setObjectName("layoutWidget");
+        layoutWidget->setGeometry(QRect(270, 160, 201, 191));
+        verticalLayout = new QVBoxLayout(layoutWidget);
         verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(0, 0, 0, 0);
-        label = new QLabel(widget);
+        label = new QLabel(layoutWidget);
         label->setObjectName("label");
         label->setAlignment(Qt::AlignmentFlag::AlignCenter);
 
@@ -59,7 +59,7 @@ public:
 
         verticalLayout->addItem(verticalSpacer);
 
-        pushButton = new QPushButton(widget);
+        pushButton = new QPushButton(layoutWidget);
         pushButton->setObjectName("pushButton");
 
         verticalLayout->addWidget(pushButton);
@@ -68,7 +68,7 @@ public:
 
         verticalLayout->addItem(verticalSpacer_2);
 
-        pushButton_2 = new QPushButton(widget);
+        pushButton_2 = new QPushButton(layoutWidget);
         pushButton_2->setObjectName("pushButton_2");
 
         verticalLayout->addWidget(pushButton_2);
@@ -89,7 +89,7 @@ public:
 
     void retranslateUi(QMainWindow *StudentWindow)
     {
-        StudentWindow->setWindowTitle(QCoreApplication::translate("StudentWindow", "MainWindow", nullptr));
+        StudentWindow->setWindowTitle(QCoreApplication::translate("StudentWindow", "\345\255\246\347\224\237\345\212\237\350\203\275", nullptr));
         label->setText(QCoreApplication::translate("StudentWindow", "\345\255\246\347\224\237\350\257\225\351\242\230\347\263\273\347\273\237", nullptr));
         pushButton->setText(QCoreApplication::translate("StudentWindow", "\345\276\205\345\256\214\346\210\220\350\200\203\350\257\225", nullptr));
         pushButton_2->setText(QCoreApplication::translate("StudentWindow", "\345\267\262\345\256\214\346\210\220\350\200\203\350\257\225", nullptr));

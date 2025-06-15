@@ -89,7 +89,7 @@ public:
 
     void retranslateUi(QMainWindow *UploadQuestionWindow)
     {
-        UploadQuestionWindow->setWindowTitle(QCoreApplication::translate("UploadQuestionWindow", "MainWindow", nullptr));
+        UploadQuestionWindow->setWindowTitle(QCoreApplication::translate("UploadQuestionWindow", "\344\270\212\344\274\240\351\242\230\347\233\256", nullptr));
         singleselect_pushButton->setText(QCoreApplication::translate("UploadQuestionWindow", "\345\215\225\351\200\211\351\242\230", nullptr));
         mulselect_pushButton_2->setText(QCoreApplication::translate("UploadQuestionWindow", "\345\244\232\351\200\211\351\242\230", nullptr));
         judge_pushButton_3->setText(QCoreApplication::translate("UploadQuestionWindow", "\345\210\244\346\226\255\351\242\230", nullptr));

@@ -383,6 +383,12 @@
 			null
 		],
 		[
+			"C:/Users/ASUS/Documents/TestSystem/testview.h",
+			"MU",
+			"EWIEGA46WW/moc_testview.cpp",
+			null
+		],
+		[
 			"C:/Users/ASUS/Documents/TestSystem/uploadquestionwindow.h",
 			"MU",
 			"EWIEGA46WW/moc_uploadquestionwindow.cpp",
@@ -522,6 +528,7 @@
 			"MU",
 			null
 		],
+		[ "C:/Users/ASUS/Documents/TestSystem/testview.cpp", "MU", null ],
 		[
 			"C:/Users/ASUS/Documents/TestSystem/uploadquestionwindow.cpp",
 			"MU",

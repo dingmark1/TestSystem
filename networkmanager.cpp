@@ -1078,3 +1078,162 @@ void NetworkManager::handleAIResponse(QNetworkReply *reply)
 
     emit aiRequestFinished(success, message, question, options, answer);
 }
+
+
+// 发送试卷查询请求
+void NetworkManager::sendTestQueryRequest(const QString &content, const QString &uploader) {
+    QUrl url(QString("%1/query_test").arg(BASE_URL));
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QJsonObject json;
+    json["content"] = content;
+    json["uploader"] = uploader;
+
+    QNetworkReply *reply = m_networkManager->post(request, QJsonDocument(json).toJson());
+
+    QTimer *timeoutTimer = new QTimer(reply);
+    timeoutTimer->setSingleShot(true);
+    connect(timeoutTimer, &QTimer::timeout, [=]() {
+        reply->abort();
+        emit testQueryFinished(false, "请求超时", QJsonArray());
+        reply->deleteLater();
+    });
+    timeoutTimer->start(30000);
+
+    connect(reply, &QNetworkReply::finished, [=]() {
+        timeoutTimer->stop();
+        handleTestQueryResponse(reply);
+        reply->deleteLater();
+        timeoutTimer->deleteLater();
+    });
+}
+
+// 处理试卷查询响应
+void NetworkManager::handleTestQueryResponse(QNetworkReply *reply) {
+    bool success = false;
+    QString message;
+    QJsonArray testList;
+
+    if (reply->error() == QNetworkReply::NoError) {
+        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+        QJsonObject obj = doc.object();
+        int code = obj["code"].toInt();
+        message = obj["message"].toString();
+
+        if (code == 200) {
+            success = true;
+            testList = obj["data"].toArray();
+        }
+    } else {
+        message = reply->errorString();
+    }
+
+    emit testQueryFinished(success, message, testList);
+}
+
+// 发送试卷题目查询请求
+void NetworkManager::sendTestQuestionQueryRequest(const QString &testId) {
+    QUrl url(QString("%1/query_test_question").arg(BASE_URL));
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QJsonObject json;
+    json["test_id"] = testId;
+
+    QNetworkReply *reply = m_networkManager->post(request, QJsonDocument(json).toJson());
+
+    QTimer *timeoutTimer = new QTimer(reply);
+    timeoutTimer->setSingleShot(true);
+    connect(timeoutTimer, &QTimer::timeout, [=]() {
+        reply->abort();
+        emit testQuestionQueryFinished(false, "请求超时", QJsonArray());
+        reply->deleteLater();
+    });
+    timeoutTimer->start(30000);
+
+    connect(reply, &QNetworkReply::finished, [=]() {
+        timeoutTimer->stop();
+        handleTestQuestionQueryResponse(reply);
+        reply->deleteLater();
+        timeoutTimer->deleteLater();
+    });
+}
+
+// 处理试卷题目查询响应
+void NetworkManager::handleTestQuestionQueryResponse(QNetworkReply *reply) {
+    bool success = false;
+    QString message;
+    QJsonArray questionList;
+
+    if (reply->error() == QNetworkReply::NoError) {
+        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+        QJsonObject obj = doc.object();
+        int code = obj["code"].toInt();
+        message = obj["message"].toString();
+
+        if (code == 200) {
+            success = true;
+            questionList = obj["data"].toArray();
+        }
+    } else {
+        message = reply->errorString();
+    }
+
+    emit testQuestionQueryFinished(success, message, questionList);
+}
+
+void NetworkManager::sendDownloadTestRequest(const QStringList &testIds)
+{
+    QUrl url(QString("%1/download_test").arg(BASE_URL));
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QJsonObject json;
+    QJsonArray idArray;
+    for (const QString &id : testIds) {
+        idArray.append(id);
+    }
+    json["test_ids"] = idArray;
+
+    QNetworkReply *reply = m_networkManager->post(request, QJsonDocument(json).toJson());
+
+    QTimer *timeoutTimer = new QTimer(reply);
+    timeoutTimer->setSingleShot(true);
+    connect(timeoutTimer, &QTimer::timeout, [=]() {
+        reply->abort();
+        emit downloadTestFinished(false, "请求超时", QJsonArray());
+        reply->deleteLater();
+    });
+    timeoutTimer->start(30000);
+
+    connect(reply, &QNetworkReply::finished, [=]() {
+        timeoutTimer->stop();
+        handleDownloadTestResponse(reply);
+        reply->deleteLater();
+        timeoutTimer->deleteLater();
+    });
+}
+
+void NetworkManager::handleDownloadTestResponse(QNetworkReply *reply)
+{
+    bool success = false;
+    QString message;
+    QJsonArray questionData;
+
+    if (reply->error() == QNetworkReply::NoError) {
+        QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+        QJsonObject obj = doc.object();
+        int code = obj["code"].toInt();
+        message = obj["message"].toString();
+
+        if (code == 200) {
+            success = true;
+            questionData = obj["data"].toArray();
+        }
+    } else {
+        message = reply->errorString();
+    }
+
+    emit downloadTestFinished(success, message, questionData);
+}

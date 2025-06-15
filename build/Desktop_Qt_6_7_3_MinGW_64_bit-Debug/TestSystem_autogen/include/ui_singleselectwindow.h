@@ -282,7 +282,7 @@ public:
 
     void retranslateUi(QMainWindow *SingleSelectWindow)
     {
-        SingleSelectWindow->setWindowTitle(QCoreApplication::translate("SingleSelectWindow", "\344\270\212\344\274\240\345\215\225\351\200\211\351\242\230", nullptr));
+        SingleSelectWindow->setWindowTitle(QCoreApplication::translate("SingleSelectWindow", "\345\215\225\351\200\211\351\242\230", nullptr));
         label_7->setText(QCoreApplication::translate("SingleSelectWindow", "\345\215\225\351\241\271\351\200\211\346\213\251\351\242\230", nullptr));
         pushButton->setText(QCoreApplication::translate("SingleSelectWindow", "AI\345\212\251\346\211\213", nullptr));
         label->setText(QCoreApplication::translate("SingleSelectWindow", "\351\242\230   \347\233\256", nullptr));

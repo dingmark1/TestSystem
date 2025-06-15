@@ -181,7 +181,7 @@ public:
 
     void retranslateUi(QMainWindow *ShortAnswerWindow)
     {
-        ShortAnswerWindow->setWindowTitle(QCoreApplication::translate("ShortAnswerWindow", "MainWindow", nullptr));
+        ShortAnswerWindow->setWindowTitle(QCoreApplication::translate("ShortAnswerWindow", "\347\256\200\347\255\224\351\242\230", nullptr));
         label_7->setText(QCoreApplication::translate("ShortAnswerWindow", "\347\256\200\347\255\224\351\242\230", nullptr));
         pushButton->setText(QCoreApplication::translate("ShortAnswerWindow", "AI\345\212\251\346\211\213", nullptr));
         label->setText(QCoreApplication::translate("ShortAnswerWindow", "\351\242\230  \347\233\256", nullptr));

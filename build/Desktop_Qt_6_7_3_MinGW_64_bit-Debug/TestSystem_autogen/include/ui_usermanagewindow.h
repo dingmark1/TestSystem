@@ -143,7 +143,7 @@ public:
 
     void retranslateUi(QMainWindow *UserManageWindow)
     {
-        UserManageWindow->setWindowTitle(QCoreApplication::translate("UserManageWindow", "MainWindow", nullptr));
+        UserManageWindow->setWindowTitle(QCoreApplication::translate("UserManageWindow", "\347\224\250\346\210\267\347\256\241\347\220\206", nullptr));
         QTableWidgetItem *___qtablewidgetitem = user_TableWidget->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("UserManageWindow", "\347\224\250\346\210\267id", nullptr));
         QTableWidgetItem *___qtablewidgetitem1 = user_TableWidget->horizontalHeaderItem(1);
