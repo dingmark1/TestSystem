@@ -4,8 +4,6 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 import jwt
 from functools import wraps
-
-from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash, check_password_hash
 import logging
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -268,7 +266,11 @@ def query_question():
     try:
         data = request.get_json()
 
-        questions = Question.query.filter_by(uploader=data['uploader'], question = data['content']).all()
+        print(data['uploader'])
+        if(data['uploader'] == "_ALL_"):
+            questions = Question.query.filter_by(subject = data['content']).all()
+        else:
+            questions = Question.query.filter_by(uploader=data['uploader'], subject = data['content']).all()
 
         return jsonify(
             code=200,
@@ -630,35 +632,38 @@ def add_user():
 @app.route('/add_test', methods=['POST'])
 def add_test():
     try:
-        user = g.current_user
         data = request.get_json()
-        print(data)
-
         required = ['test_name', 'uploader', 'question_ids']
         valid, msg = validate_required(data, required)
         if not valid:
             return jsonify(code=400, message=msg), 400
 
+        questions = [str(item) for item in data['question_ids']]
+        uploader = User.query.filter_by(username = data['uploader']).first()
+
         paper = ExamPaper(
-            name = data['name'],
-            creator_id = user.id,
+            name = data['test_name'],
+            creator_id = uploader.id,
             created_at = datetime.utcnow()
         )
         
         # 预检查所有题目
-        for qid in data['question_ids']:
-            question = db.session.get(Question, qid)
+        for qid in questions:
+            question = Question.query.filter_by(sid = qid).first()
             if not question:
                 return jsonify({"error": f"题目 {qid} 不存在"}), 404
         
         # 添加题目关联
-        for qid in data['question_ids']:
+        for qid in questions:
             # 使用关联代理添加（自动创建PaperQuestion）
-            question = db.session.get(Question, qid)
-            paper.questions.append( (db.session.get(Question, qid), question['score']) )
+            question = Question.query.filter_by(sid = qid).first()
+            paper.questions.append( (question, 10) )
         
         db.session.add(paper)
+        db.session.flush()
+        paper.sid = str(paper.id)
         db.session.commit()
+
         return jsonify(code=200, message="Test created"), 200
     except Exception as e:
         return jsonify(code=500, message=str(e)), 500
