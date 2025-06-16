@@ -10,6 +10,8 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from flask import g
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.exc import SQLAlchemyError
+import requests
+import json
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -669,233 +671,135 @@ def add_test():
         return jsonify(code=500, message=str(e)), 500
 
 
-"""
+# DeepSeek API配置
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
+DEEPSEEK_API_KEY = "sk-390b7badffc34e4e93246dcb856764b3"  # 替换为您的实际API密钥
 
-@app.route('/api/register', methods=['POST'])
-def register():
-    data = request.get_json()
-    if User.query.filter_by(username=data['username']).first():
-        return jsonify({"error": "用户名已存在"}), 400
-    
-    new_user = User(
-        username=data['username'],
-        role=data.get('user_type', 'student')
-    )
-    new_user.set_password(data['password'])
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify({"message": "用户创建成功"}), 201
-
-# 修正后的登录路由
-@app.route("/api/login", methods=["POST"])
-def login():
-    auth = request.authorization
-    if not auth or not auth.username or not auth.password:
-        return jsonify({"error": "需要用户名和密码"}), 401
-
-    user = User.query.filter_by(username=auth.username).first()
-    if not user or not user.check_password(auth.password):
-        return jsonify({"error": "无效凭证"}), 401
-
+@app.route('/AI_request', methods=['POST'])
+def ai_request():
     try:
-        token = jwt.encode(
-            {
-                "user_id": user.id,
-                "role": user.role,  # 确保包含角色信息
-                "exp": datetime.utcnow() + timedelta(hours=1)
-            },
-            app.config["SECRET_KEY"],
-            algorithm="HS256"
-        )
-        return jsonify({"token": token})
-    except Exception as e:
-        return jsonify({"error": "令牌生成失败"}), 500
-
-@app.route('/api/questions', methods=['POST'])
-@role_required('teacher')
-def create_question():
-    user = g.current_user
-    try:
-        if 'image' in request.files:
-            image_file = request.files['image']
-            question_data = request.form.to_dict()
-            image_data = image_file.read()
-        else:
-            question_data = request.get_json()
-            image_data = None
-
-        new_question = Question(
-            type=question_data['type'],
-            content=question_data['content'],
-            answer=question_data['answer'],
-            subject=question_data.get('subject'),
-            difficulty=question_data.get('difficulty', 3),
-            creator_id=get_current_user().id,
-            image_data=image_data
-        )
-        db.session.add(new_question)
-        db.session.commit()
-        return jsonify({"question_id": new_question.id}), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/papers', methods=['POST'])
-@role_required('teacher')
-def create_paper():
-    user = g.current_user
-    data = request.get_json()
-    required = ['name', 'questions']
-    
-    # 字段验证
-    if not all(k in data for k in required):
-        return jsonify({"error": f"缺少必要字段: {required}"}), 400
+        # 解析前端请求数据
+        data = request.get_json()
+        prompt = data.get('prompt')
+        question_type = data.get('question_type')
         
-    try:
-        paper = ExamPaper(
-            name=data['name'],
-            creator_id=user.id
+        if not prompt or not question_type:
+            return jsonify(code=400, message="Missing prompt or question_type"), 400
+        
+        # 调用DeepSeek API生成题目
+        headers = {
+            "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        
+        # 根据题型定制系统提示
+        if questions_type == "单选题":
+            system_prompt = f"""
+            你是一个专业的题目生成助手，请根据用户要求生成一道单选题。
+            返回格式必须是严格的JSON，包含以下字段：
+            - question: 题目文本，以及ABCD四个选项
+            - answer: 1个数字，表示本题正确答案，1 2 3 4分别表示A B C D
+            """
+        if questions_type == "多选题":
+            system_prompt = f"""
+            你是一个专业的题目生成助手，请根据用户要求生成一道多选题。
+            返回格式必须是严格的JSON，包含以下字段：
+            - question: 题目文本，以及ABCD四个选项
+            - answer: 2或3个数字，表示本题正确答案，1 2 3 4分别表示A B C D
+            """
+        if questions_type == "判断题":
+            system_prompt = f"""
+            你是一个专业的题目生成助手，请根据用户要求生成一道判断题。
+            返回格式必须是严格的JSON，包含以下字段：
+            - question: 题目文本
+            - answer: 1个数字，表示本题正确答案，0表示错误，1表示正确
+            """
+        if questions_type == "简答题":
+            system_prompt = f"""
+            你是一个专业的题目生成助手，请根据用户要求生成一道简答题。
+            返回格式必须是严格的JSON，包含以下字段：
+            - question: 题目文本
+            - answer: 题目答案
+            """
+        
+        payload = {
+            "model": "deepseek-chat",
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.7,
+            "max_tokens": 2000
+        }
+        
+        # 发送请求到DeepSeek
+        response = requests.post(
+            DEEPSEEK_API_URL,
+            headers=headers,
+            json=payload,
+            timeout=30  # 30秒超时
         )
         
-        # 预检查所有题目
-        for q in data['questions']:
-            question = db.session.get(Question, q['id'])
-            if not question:
-                return jsonify({"error": f"题目 {q['id']} 不存在"}), 404
-        
-        # 添加题目关联
-        for q in data['questions']:
-            # 使用关联代理添加（自动创建PaperQuestion）
-            paper.questions.append( (db.session.get(Question, q['id']), q['score']) )
-        
-        db.session.add(paper)
-        db.session.commit()
-        return jsonify({"paper_id": paper.id}), 201
-        
-    except Exception as e:
-        db.session.rollback()
-        app.logger.error(f"组卷失败: {str(e)}", exc_info=True)  # 记录完整堆栈
-        return jsonify({"error": "服务器内部错误"}), 500
-
-@app.route('/api/exam/start/<int:paper_id>', methods=['POST'])
-@role_required('student')
-def start_exam(paper_id):
-    try:
-        user = g.current_user  # 从上下文获取
-        record = ExamRecord(
-            user_id=user.id,
-            paper_id=paper_id,
-            start_time=datetime.utcnow()
-        )
-        db.session.add(record)
-        db.session.commit()
-        return jsonify({"record_id": record.id}), 201
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/exam/submit', methods=['POST'])
-@role_required('student')
-def submit_answer():
-    user = g.current_user
-    data = request.get_json()
-    exam_answer = ExamAnswer(
-        record_id=data['record_id'],
-        question_id=data['question_id'],
-        user_answer=data['answer']
-    )
-    db.session.add(exam_answer)
-    db.session.commit()
-    return jsonify({"status": "答案提交成功"})
-
-@app.route('/api/exam/upload-image', methods=['POST'])
-@role_required('student')
-def upload_answer_image():
-    user = g.current_user
-    record_id = request.form.get('record_id')
-    image_file = request.files['image']
-    
-    image = AnswerImage(
-        record_id=record_id,
-        image_data=image_file.read()
-    )
-    db.session.add(image)
-    db.session.commit()
-    return jsonify({"status": "图片上传成功"})
-
-
-@app.route('/api/grade/<int:record_id>', methods=['POST'])
-@role_required('teacher')
-def grade_exam(record_id):
-    try:
-        record = db.session.get(ExamRecord, record_id)
-        if not record:
-            return jsonify({"error": "考试记录不存在"}), 404
+        # 检查API响应
+        if response.status_code != 200:
+            return jsonify(
+                code=503,
+                message=f"AI service error: {response.text}"
+            ), 503
             
-        answers = ExamAnswer.query.filter_by(record_id=record_id).all()
-        total_score = 0
+        ai_response = response.json()
+        content = ai_response['choices'][0]['message']['content']
+
+        print(content)
         
-        for answer in answers:
-            question = db.session.get(Question, answer.question_id)
-            if not question:
-                continue
-
-            pq = PaperQuestion.query.filter_by(
-                paper_id=record.paper_id,
-                question_id=question.id
-            ).first()
-            if not pq:
-                continue
-
-            # 统一处理答案格式
-            user_answer = (answer.user_answer or "").strip().lower()
-            correct_answer = (question.answer or "").strip().lower()
-
-            if question.type == 'choice':
-                if user_answer == correct_answer:
-                    total_score += pq.score
-                    answer.score = pq.score
-            elif question.type == 'fill':
-                # 填空题支持多个正确答案（逗号分隔）
-                correct_answers = [a.strip() for a in correct_answer.split(',')]
-                if user_answer in correct_answers:
-                    total_score += pq.score
-                    answer.score = pq.score
-            # 可扩展其他题型逻辑
-            
-        record.total_score = total_score
-        record.end_time = datetime.utcnow()
-        db.session.commit()
-        return jsonify({"total_score": total_score})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/api/papers/<int:paper_id>', methods=['DELETE'])
-@role_required('teacher')
-def delete_paper(paper_id):
-    try:
-        paper = db.session.get(ExamPaper, paper_id)
-        if not paper:
-            return jsonify({"error": "试卷不存在"}), 404
+        # 尝试解析JSON内容
+        try:
+            result = json.loads(content)
+        except json.JSONDecodeError:
+            # 如果返回的不是有效JSON，尝试提取JSON部分
+            start = content.find('{')
+            end = content.rfind('}') + 1
+            if start != -1 and end != -1:
+                result = json.loads(content[start:end])
+            else:
+                return jsonify(
+                    code=500,
+                    message="AI returned invalid JSON format"
+                ), 500
         
-        # 删除关联题目关系
-        db.session.query(PaperQuestion).filter_by(paper_id=paper_id).delete()
-        db.session.delete(paper)
-        db.session.commit()
-        return jsonify({"message": "试卷删除成功"}), 200
+        # 验证必要字段
+        required_fields = ["question", "answer"]
+        if question_type == "单选题" and "answer" not in result:
+            return jsonify(
+                code=500,
+                message="AI response missing required fields"
+            ), 500
+        
+        # 构建响应数据
+        response_data = {
+            "question": result["question"],
+            "answer": result["answer"]
+        }
+        
+        return jsonify(
+            code=200,
+            message="Success",
+            data=response_data
+        )
+
+    except requests.exceptions.Timeout:
+        return jsonify(
+            code=504,
+            message="AI service timeout"
+        ), 504
+        
     except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+        return jsonify(
+            code=500,
+            message=f"Internal server error: {str(e)}"
+        ), 500
 
-# ------------------ 错误处理 ------------------
-@app.errorhandler(404)
-def not_found(error):
-    return jsonify({"error": "资源未找到"}), 404
 
-@app.errorhandler(500)
-def internal_error(error):
-    return jsonify({"error": "服务器内部错误"}), 500
-"""
 
 def create_initial_user():
     with app.app_context():
