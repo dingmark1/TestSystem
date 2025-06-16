@@ -1,4 +1,7 @@
-安装依赖：pip install flask flask-sqlalchemy PyJWT werkzeug psycopg2-binary python-dotenv
+安装依赖：
+
+pip install flask flask-sqlalchemy PyJWT werkzeug psycopg2-binary python-dotenv sqlalchemy json requests
+
 
 参考：
 flask>=3.0.0
