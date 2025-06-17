@@ -61,6 +61,8 @@ class ExamPaper(db.Model):
     name = db.Column(db.String(200), nullable=False)
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    uploader = db.Column(db.String(200), nullable=False)
+    subject = db.Column(db.String(50))
     
     paper_questions = db.relationship('PaperQuestion', back_populates='paper')
     questions = association_proxy(
@@ -646,7 +648,8 @@ def add_test():
         paper = ExamPaper(
             name = data['test_name'],
             creator_id = uploader.id,
-            created_at = datetime.utcnow()
+            created_at = datetime.utcnow(),
+            uploader = data['uploader']
         )
         
         # 预检查所有题目
@@ -670,6 +673,115 @@ def add_test():
     except Exception as e:
         return jsonify(code=500, message=str(e)), 500
 
+@app.route('/query_test', methods=['POST'])
+def query_test():
+    try:
+        data = request.get_json()
+        # print(data)
+        # user = User.query.filter_by(user_type = data['type'], username = data['content']).first()
+        # print(user.id, user.username, user.user_type)
+
+        tests = ExamPaper.query.filter_by(uploader = data['uploader']).all()
+        
+        return jsonify(
+            code=200,
+            message="Success",
+            data=[{
+                #'id': str(u.id),
+                'id': t.sid,
+                'name': t.name,
+                'uploader': t.uploader,
+                'time': t.created_at
+            } for t in tests]
+        )
+
+    except Exception as e:
+        return jsonify(code=500, message=str(e)), 500
+
+@app.route('/query_test_question', methods=['POST'])
+def query_test_question():
+    try:
+        data = request.get_json()
+        test = ExamPaper.query.filter_by(sid=data['test_id']).first()
+        
+        if not test:
+            return jsonify(code=404, message="试卷不存在"), 404
+        
+        # 获取试卷所有题目及分值
+        questions_data = []
+        for pq in test.paper_questions:
+            question = pq.question
+            questions_data.append({
+                'question_id': question.sid,  # 使用题目唯一标识sid
+                'type': question.qtype,        # 修正字段名
+                'content': question.question,   # 修正字段名
+                'options': question.options,    # 直接使用JSON对象
+                'answer': question.answer,
+                'subject': question.subject     # 添加科目信息
+            })
+        
+        return jsonify(
+            code=200,
+            message="Success",
+            data={
+                'test_id': test.sid,
+                'test_name': test.name,
+                'subject': test.subject,
+                'creator': test.uploader,       # 添加创建者信息
+                'questions': questions_data
+            }
+        )
+
+    except Exception as e:
+        return jsonify(code=500, message=str(e)), 500
+
+@app.route('/download_test', methods=['POST'])
+def download_test():
+    try:
+        data = request.get_json()
+        test_ids = data.get('test_ids', [])
+        
+        # 验证试卷ID列表
+        if not test_ids:
+            return jsonify(code=400, message="试卷ID列表不能为空"), 400
+        
+        # 查询所有试卷
+        papers = ExamPaper.query.filter(ExamPaper.sid.in_(test_ids)).all()
+        
+        # 检查所有试卷是否存在
+        found_ids = {p.sid for p in papers}
+        missing_ids = set(test_ids) - found_ids
+        if missing_ids:
+            return jsonify(
+                code=404, 
+                message=f"以下试卷不存在: {', '.join(missing_ids)}"
+            ), 404
+        
+        # 收集所有题目数据
+        question_data = []
+        for paper in papers:
+            for pq in paper.paper_questions:
+                q = pq.question
+                question_data.append({
+                    'test_id': paper.sid,        # 试卷ID
+                    'test_name': paper.name,     # 试卷名称
+                    'question_id': q.sid,        # 题目ID
+                    'type': q.qtype,             # 题型
+                    'content': q.question,       # 题目内容
+                    'options': q.options,        # 选项
+                    'answer': q.answer,          # 答案
+                    'subject': q.subject,        # 科目
+                    'uploader': q.uploader       # 上传者
+                })
+        
+        return jsonify(
+            code=200,
+            message="Success",
+            data=question_data
+        )
+
+    except Exception as e:
+        return jsonify(code=500, message=str(e)), 500
 
 # DeepSeek API配置
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
@@ -697,7 +809,8 @@ def ai_request():
             system_prompt = f"""
             你是一个专业的题目生成助手，请根据用户要求生成一道单选题。
             返回格式必须是严格的JSON，包含以下字段：
-            - question: 题目文本，以及ABCD四个选项
+            - question: 题目的题干
+            - options: Json类型，四个元素依次分别为四个选项的内容
             - answer: 1个数字，表示本题正确答案，1 2 3 4分别表示A B C D
             """
         if questions_type == "多选题":
@@ -705,6 +818,7 @@ def ai_request():
             你是一个专业的题目生成助手，请根据用户要求生成一道多选题。
             返回格式必须是严格的JSON，包含以下字段：
             - question: 题目文本，以及ABCD四个选项
+            - options: Json类型，四个元素依次分别为四个选项的内容
             - answer: 2或3个数字，表示本题正确答案，1 2 3 4分别表示A B C D
             """
         if questions_type == "判断题":
@@ -769,7 +883,7 @@ def ai_request():
         
         # 验证必要字段
         required_fields = ["question", "answer"]
-        if question_type == "单选题" and "answer" not in result:
+        if (question_type == "单选题" or question_type == "多选题")and "options" not in result:
             return jsonify(
                 code=500,
                 message="AI response missing required fields"
@@ -780,6 +894,12 @@ def ai_request():
             "question": result["question"],
             "answer": result["answer"]
         }
+        if (question_type == "单选题" or question_type == "多选题"):
+            response_data = {
+                "question": result["question"],
+                "options": result["options"],
+                "answer": result["answer"]
+            }
         
         return jsonify(
             code=200,
