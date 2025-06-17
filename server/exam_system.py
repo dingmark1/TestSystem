@@ -271,9 +271,13 @@ def query_question():
         data = request.get_json()
 
         print(data['uploader'])
-        if(data['uploader'] == "_ALL_"):
+        if (data['uploader'] == "_ALL_" and data['content'] == ""):
+            questions = Question.query.all()
+        elif data['uploader'] == "_ALL_" and data['content'] != "":
             questions = Question.query.filter_by(subject = data['content']).all()
-        else:
+        elif data['uploader'] != "_ALL_" and data['content'] == "":
+            questions = Question.query.filter_by(uploader=data['uploader']).all()
+        elif data['uploader'] != "_ALL_" and data['content'] != "":
             questions = Question.query.filter_by(uploader=data['uploader'], subject = data['content']).all()
 
         return jsonify(
@@ -563,8 +567,12 @@ def query_user():
         # print(data)
         # user = User.query.filter_by(user_type = data['type'], username = data['content']).first()
         # print(user.id, user.username, user.user_type)
-
-        users = User.query.filter_by(user_type = data['type'], username = data['content']).all()
+        if data['type'] == "全部":
+            users = User.query.all()
+        elif data['content'] == "":
+            user = User.query.filter_by(user_type = data['type']).all()
+        else:
+            users = User.query.filter_by(user_type = data['type'], username = data['content']).all()
         
         return jsonify(
             code=200,
@@ -637,7 +645,7 @@ def add_user():
 def add_test():
     try:
         data = request.get_json()
-        required = ['test_name', 'uploader', 'question_ids']
+        required = ['test_name', 'uploader', 'question_ids', 'test_subject']
         valid, msg = validate_required(data, required)
         if not valid:
             return jsonify(code=400, message=msg), 400
@@ -649,7 +657,8 @@ def add_test():
             name = data['test_name'],
             creator_id = uploader.id,
             created_at = datetime.utcnow(),
-            uploader = data['uploader']
+            uploader = data['uploader'],
+            subject = data['test_subject']
         )
         
         # 预检查所有题目
@@ -680,8 +689,10 @@ def query_test():
         # print(data)
         # user = User.query.filter_by(user_type = data['type'], username = data['content']).first()
         # print(user.id, user.username, user.user_type)
-
-        tests = ExamPaper.query.filter_by(uploader = data['uploader']).all()
+        if(data['content'] == ''):
+            tests = ExamPaper.query.all()
+        else:
+            tests = ExamPaper.query.filter_by(name = data['content']).all()
         
         return jsonify(
             code=200,
@@ -689,8 +700,9 @@ def query_test():
             data=[{
                 #'id': str(u.id),
                 'id': t.sid,
-                'name': t.name,
+                'testname': t.name,
                 'uploader': t.uploader,
+                'subject': t.subject,
                 'time': t.created_at
             } for t in tests]
         )
@@ -827,7 +839,7 @@ def ai_request():
             你是一个专业的题目生成助手，请根据用户要求生成一道简答题。
             返回格式必须是严格的JSON，包含以下字段：
             - question: 题目文本
-            - answer: 题目答案
+            - options: JSON格式，第一个元素为本题答案，剩下三个元素为空，格式形如["题目答案", "", "", ""]
             """
         
         payload = {
@@ -875,24 +887,24 @@ def ai_request():
                     message="AI returned invalid JSON format"
                 ), 500
         
-        # 验证必要字段
-        required_fields = ["question", "answer"]
-        if (question_type == "单选题" or question_type == "多选题")and "options" not in result:
-            return jsonify(
-                code=500,
-                message="AI response missing required fields"
-            ), 500
         
         # 构建响应数据
-        response_data = {
-            "question": result["question"],
-            "answer": result["answer"]
-        }
+        if(question_type == "判断题"):
+            response_data = {
+                "question": result["question"],
+                "options": "",
+                "answer": result["answer"]
+            }
         if (question_type == "单选题" or question_type == "多选题"):
             response_data = {
                 "question": result["question"],
                 "options": result["options"],
                 "answer": result["answer"]
+            }
+        if(question_type == "简答题"):
+            response_data = {
+                "question": result["question"],
+                "options": result["options"]
             }
         
         return jsonify(
