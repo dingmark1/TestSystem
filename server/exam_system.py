@@ -712,9 +712,9 @@ def query_test_question():
         for pq in test.paper_questions:
             question = pq.question
             questions_data.append({
-                'question_id': question.sid,  # 使用题目唯一标识sid
+                'id': question.sid,  # 使用题目唯一标识sid
                 'type': question.qtype,        # 修正字段名
-                'content': question.question,   # 修正字段名
+                'question': question.question,   # 修正字段名
                 'options': question.options,    # 直接使用JSON对象
                 'answer': question.answer,
                 'subject': question.subject     # 添加科目信息
@@ -723,13 +723,7 @@ def query_test_question():
         return jsonify(
             code=200,
             message="Success",
-            data={
-                'test_id': test.sid,
-                'test_name': test.name,
-                'subject': test.subject,
-                'creator': test.uploader,       # 添加创建者信息
-                'questions': questions_data
-            }
+            data=questions_data
         )
 
     except Exception as e:
@@ -767,7 +761,7 @@ def download_test():
                     'test_name': paper.name,     # 试卷名称
                     'question_id': q.sid,        # 题目ID
                     'type': q.qtype,             # 题型
-                    'content': q.question,       # 题目内容
+                    'question': q.question,       # 题目内容
                     'options': q.options,        # 选项
                     'answer': q.answer,          # 答案
                     'subject': q.subject,        # 科目
@@ -805,30 +799,30 @@ def ai_request():
         }
         
         # 根据题型定制系统提示
-        if questions_type == "单选题":
+        if question_type == "单选题":
             system_prompt = f"""
             你是一个专业的题目生成助手，请根据用户要求生成一道单选题。
             返回格式必须是严格的JSON，包含以下字段：
             - question: 题目的题干
-            - options: Json类型，四个元素依次分别为四个选项的内容
+            - options: Json类型，四个元素依次分别为四个选项的内容, 格式形如["内容1", "内容2", "内容3", "内容4"]
             - answer: 1个数字，表示本题正确答案，1 2 3 4分别表示A B C D
             """
-        if questions_type == "多选题":
+        if question_type == "多选题":
             system_prompt = f"""
             你是一个专业的题目生成助手，请根据用户要求生成一道多选题。
             返回格式必须是严格的JSON，包含以下字段：
             - question: 题目文本，以及ABCD四个选项
-            - options: Json类型，四个元素依次分别为四个选项的内容
+            - options: Json类型，四个元素依次分别为四个选项的内容, 格式形如["内容1", "内容2", "内容3", "内容4"]
             - answer: 2或3个数字，表示本题正确答案，1 2 3 4分别表示A B C D
             """
-        if questions_type == "判断题":
+        if question_type == "判断题":
             system_prompt = f"""
             你是一个专业的题目生成助手，请根据用户要求生成一道判断题。
             返回格式必须是严格的JSON，包含以下字段：
             - question: 题目文本
             - answer: 1个数字，表示本题正确答案，0表示错误，1表示正确
             """
-        if questions_type == "简答题":
+        if question_type == "简答题":
             system_prompt = f"""
             你是一个专业的题目生成助手，请根据用户要求生成一道简答题。
             返回格式必须是严格的JSON，包含以下字段：
